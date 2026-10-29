@@ -55,3 +55,9 @@ Before launch, verify with the artist: biography, work titles, exhibition descri
 - Reduced-motion support and visible keyboard focus
 - Both published root HTML pages and Astro source share the same responsive styles
 - Verify on real devices before launch, particularly landscape mode and accessibility with screen readers
+
+## Sticky navigation and arrow-free interface
+
+- Header remains visible while scrolling on desktop, tablet and mobile.
+- Anchor scroll offsets account for the header.
+- Decorative arrows have been removed; exhibition source and back-to-top links retain descriptive text.

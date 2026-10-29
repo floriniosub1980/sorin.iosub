@@ -27,7 +27,7 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
   <header class="site-header">
     <a class="brand" href={'/' + lang + '/'} aria-label="Sorin Iosub home">SORIN <span>IOSUB</span></a>
     <nav aria-label="Main navigation">{t.nav.map((item, i) => <a href={'#' + ids[i]}>{item}</a>)}</nav>
-    <a class="lang" href={target}>{t.language} ↗</a>
+    <a class="lang" href={target}>{t.language}</a>
     <details class="mobile-menu">
       <summary aria-label={lang === 'ro' ? 'Deschide sau închide meniul' : 'Open or close navigation'}>
         <span class="menu-label">{lang === 'ro' ? 'Meniu' : 'Menu'}</span>
@@ -35,23 +35,23 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
       </summary>
       <nav aria-label={lang === 'ro' ? 'Navigare mobilă' : 'Mobile navigation'}>
         {t.nav.map((item, i) => <a href={'#' + ids[i]}>{item}</a>)}
-        <a class="mobile-language" href={target}>{t.language} ↗</a>
+        <a class="mobile-language" href={target}>{t.language}</a>
       </nav>
     </details>
   </header>
   <main id="content">
     <section class="hero section-pad">
-      <div class="hero-copy"><p class="eyebrow"><span class="dot"></span>{t.eyebrow}</p><h1>{t.heroTitle}</h1><p class="intro">{t.heroCopy}</p><a class="primary-link" href="#artworks">{t.explore} <span>↗</span></a></div>
+      <div class="hero-copy"><p class="eyebrow"><span class="dot"></span>{t.eyebrow}</p><h1>{t.heroTitle}</h1><p class="intro">{t.heroCopy}</p><a class="primary-link" href="#artworks">{t.explore} </a></div>
       <div class="hero-art" aria-label="Abstract graphic design placeholder"><div class="abstract-sun"></div><div class="abstract-arch"></div><div class="abstract-person"></div><span class="hero-caption">SORIN IOSUB / PORTFOLIO STUDY — 01</span></div>
       <div class="hero-index">01 / ARTIST PORTFOLIO</div>
     </section>
-    <section class="work-section section-pad" id="artworks"><div class="section-head"><div><p class="eyebrow">01 / PORTFOLIO</p><h2>{t.workTitle}</h2></div><p>{t.workCopy}</p></div><div class="art-grid">{works.map((work, i) => <article class="art-card"><div class="art-frame" style={'--h:' + work.hue + ';--i:' + i}><span class="abstract-shape"></span><span class="art-marker">{String(i+1).padStart(2,'0')}</span></div><div class="art-info"><div><h3>{work.id}</h3><p>{t.availability}</p></div><span class="art-icon">↗</span></div></article>)}</div><p class="notice">{t.disclaimer}</p></section>
+    <section class="work-section section-pad" id="artworks"><div class="section-head"><div><p class="eyebrow">01 / PORTFOLIO</p><h2>{t.workTitle}</h2></div><p>{t.workCopy}</p></div><div class="art-grid">{works.map((work, i) => <article class="art-card"><div class="art-frame" style={'--h:' + work.hue + ';--i:' + i}><span class="abstract-shape"></span><span class="art-marker">{String(i+1).padStart(2,'0')}</span></div><div class="art-info"><div><h3>{work.id}</h3><p>{t.availability}</p></div></div></article>)}</div><p class="notice">{t.disclaimer}</p></section>
     <section class="practice-section section-pad" id="practice"><p class="eyebrow">02 / PRACTICE</p><h2>{t.practice}</h2><div class="practice-grid"><article><span class="practice-num">01</span><h3>{t.painting}</h3><p>{t.paintingCopy}</p></article><article><span class="practice-num">02</span><h3>{t.fresco}</h3><p>{t.frescoCopy}</p></article></div></section>
-    <section class="exhibition-section section-pad" id="exhibitions"><div class="section-head"><div><p class="eyebrow">03 / ARCHIVE</p><h2>{t.exhibitions}</h2></div><p>{t.exhibitionsCopy}</p></div><div class="ex-row"><span>2026</span><div><h3>{t.ex1}</h3><p>{t.ex1copy}</p></div><a href="https://www.google.com/search?q=Sorin+Iosub+Muzeul+Apei+2026" target="_blank" rel="noopener noreferrer" aria-label={t.source + ' 2026'}>↗</a></div><div class="ex-row"><span>2015</span><div><h3>{t.ex2}</h3><p>{t.ex2copy}</p></div><a href="https://www.google.com/search?q=Sorin+Iosub+40+Metafora+2015" target="_blank" rel="noopener noreferrer" aria-label={t.source + ' 2015'}>↗</a></div></section>
+    <section class="exhibition-section section-pad" id="exhibitions"><div class="section-head"><div><p class="eyebrow">03 / ARCHIVE</p><h2>{t.exhibitions}</h2></div><p>{t.exhibitionsCopy}</p></div><div class="ex-row"><span>2026</span><div><h3>{t.ex1}</h3><p>{t.ex1copy}</p></div><a href="https://www.google.com/search?q=Sorin+Iosub+Muzeul+Apei+2026" target="_blank" rel="noopener noreferrer" aria-label={t.source + ' 2026'}>{t.source}</a></div><div class="ex-row"><span>2015</span><div><h3>{t.ex2}</h3><p>{t.ex2copy}</p></div><a href="https://www.google.com/search?q=Sorin+Iosub+40+Metafora+2015" target="_blank" rel="noopener noreferrer" aria-label={t.source + ' 2015'}>{t.source}</a></div></section>
     <section class="about-section section-pad" id="about"><p class="eyebrow">04 / ARTIST</p><div class="about-grid"><h2>{t.about}</h2><p>{t.aboutText}</p></div></section>
-    <section class="contact-section section-pad" id="contact"><p class="eyebrow">05 / CONNECT</p><h2>{t.contact}</h2><p>{t.contactText}</p><span class="contact-pill">{t.contactButton} ↗</span><p class="social-line"><a href="https://www.facebook.com/sorin.iosub.9/?locale=ro_RO" target="_blank" rel="noopener noreferrer">Facebook ↗</a></p></section>
+    <section class="contact-section section-pad" id="contact"><p class="eyebrow">05 / CONNECT</p><h2>{t.contact}</h2><p>{t.contactText}</p><span class="contact-pill">{t.contactButton}</span><p class="social-line"><a href="https://www.facebook.com/sorin.iosub.9/?locale=ro_RO" target="_blank" rel="noopener noreferrer">Facebook</a></p></section>
   </main>
-  <footer class="site-footer"><span>© {new Date().getFullYear()} SORIN IOSUB</span><span>{t.rights}</span><a href="#content">↑ TOP</a></footer>
+  <footer class="site-footer"><span>© {new Date().getFullYear()} SORIN IOSUB</span><span>{t.rights}</span><a href="#content">{lang === 'ro' ? 'Sus' : 'Top'}</a></footer>
   <script src="/mobile.js" is:inline defer></script>
 </body>
 </html>
