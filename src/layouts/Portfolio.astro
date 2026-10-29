@@ -27,7 +27,7 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
   <header class="site-header">
     <a class="brand" href={'/' + lang + '/'} aria-label="Sorin Iosub home">SORIN <span>IOSUB</span></a>
     <nav aria-label="Main navigation">{t.nav.map((item, i) => <a href={'#' + ids[i]}>{item}</a>)}</nav>
-    <a class="lang" href={target}>{t.language}</a>
+    <a class="lang" href={target}>{lang === 'en' ? '🇷🇴' : '🇬🇧'} {lang === 'en' ? '🇷🇴' : '🇬🇧'} {t.language}</a>
     <details class="mobile-menu">
       <summary aria-label={lang === 'ro' ? 'Deschide sau închide meniul' : 'Open or close navigation'}>
         <span class="menu-label">{lang === 'ro' ? 'Meniu' : 'Menu'}</span>
