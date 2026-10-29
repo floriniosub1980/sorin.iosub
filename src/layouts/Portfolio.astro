@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/responsive.css';
 import { content, works } from '../data/site';
 const { lang = 'en' } = Astro.props;
 const t = content[lang as 'en' | 'ro'];
@@ -27,6 +28,16 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
     <a class="brand" href={'/' + lang + '/'} aria-label="Sorin Iosub home">SORIN <span>IOSUB</span></a>
     <nav aria-label="Main navigation">{t.nav.map((item, i) => <a href={'#' + ids[i]}>{item}</a>)}</nav>
     <a class="lang" href={target}>{t.language} ↗</a>
+    <details class="mobile-menu">
+      <summary aria-label={lang === 'ro' ? 'Deschide sau închide meniul' : 'Open or close navigation'}>
+        <span class="menu-label">{lang === 'ro' ? 'Meniu' : 'Menu'}</span>
+        <span class="menu-lines" aria-hidden="true"><span></span><span></span></span>
+      </summary>
+      <nav aria-label={lang === 'ro' ? 'Navigare mobilă' : 'Mobile navigation'}>
+        {t.nav.map((item, i) => <a href={'#' + ids[i]}>{item}</a>)}
+        <a class="mobile-language" href={target}>{t.language} ↗</a>
+      </nav>
+    </details>
   </header>
   <main id="content">
     <section class="hero section-pad">
@@ -41,5 +52,6 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
     <section class="contact-section section-pad" id="contact"><p class="eyebrow">05 / CONNECT</p><h2>{t.contact}</h2><p>{t.contactText}</p><span class="contact-pill">{t.contactButton} ↗</span><p class="social-line"><a href="https://www.facebook.com/sorin.iosub.9/?locale=ro_RO" target="_blank" rel="noopener noreferrer">Facebook ↗</a></p></section>
   </main>
   <footer class="site-footer"><span>© {new Date().getFullYear()} SORIN IOSUB</span><span>{t.rights}</span><a href="#content">↑ TOP</a></footer>
+  <script src="/mobile.js" is:inline defer></script>
 </body>
 </html>

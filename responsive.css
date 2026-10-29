@@ -1,0 +1,147 @@
+/* Responsive design for Sorin Iosub — static Pages preview + Astro source. */
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-padding-top: 95px; }
+body { min-width: 0; overflow-x: clip; }
+main, section, .hero-copy, .section-head, .section-head > div,
+.art-card, .art-info, .ex-row > div { min-width: 0; }
+h1, h2, h3, p { overflow-wrap: break-word; }
+a:focus-visible, summary:focus-visible {
+  outline: 3px solid #9b533e;
+  outline-offset: 4px;
+}
+.skip:focus {
+  position: fixed; top: 12px; left: 12px; padding: 12px 16px;
+  z-index: 100; background: #fff; color: #242622;
+}
+.mobile-menu { display: none; }
+.site-header { position: relative; z-index: 50; background: #f6f4ef; }
+.site-header > nav a, .site-header > .lang { padding-block: 12px; }
+.primary-link { min-height: 44px; }
+.art-card .art-frame { isolation: isolate; }
+.art-info { gap: 16px; }
+.ex-row > a { display: grid; place-items: center; min-width: 44px; min-height: 44px; }
+@media (min-width: 901px) and (max-width: 1140px) {
+  .site-header { gap: 22px; padding-inline: 4%; }
+  .site-header nav { gap: 12px; }
+  .site-header nav a, .site-header > .lang { font-size: .74rem; }
+  .hero { gap: 5%; min-height: 630px; }
+}
+@media (max-width: 900px) {
+  html { scroll-padding-top: 76px; }
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: nowrap; width: 100%; min-height: 72px; height: 72px;
+    padding: 0 5%; gap: 12px;
+    box-shadow: 0 1px 0 rgba(40,43,37,.09);
+  }
+  .site-header .brand { font-size: clamp(1.04rem,3.5vw,1.36rem); letter-spacing: .1em; }
+  .site-header > nav, .site-header > .lang { display: none; }
+  .mobile-menu { display: block; margin-left: auto; flex: 0 0 auto; }
+  .mobile-menu > summary {
+    cursor: pointer; list-style: none; display: flex; gap: 12px;
+    align-items: center; justify-content: center;
+    min-width: 72px; min-height: 48px;
+    font-size: .81rem; font-weight: 600;
+    touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-menu > summary::-webkit-details-marker { display: none; }
+  .menu-lines { width: 22px; height: 15px; display: flex; flex-direction: column;
+    justify-content: space-between; }
+  .menu-lines span { display: block; height: 1.5px; width: 100%;
+    background: currentColor; transform-origin: center;
+    transition: transform .2s ease, opacity .2s ease; }
+  .mobile-menu[open] .menu-lines span:first-child { transform: translateY(6.75px) rotate(45deg); }
+  .mobile-menu[open] .menu-lines span:last-child { transform: translateY(-6.75px) rotate(-45deg); }
+  .mobile-menu nav {
+    position: absolute; z-index: 55; left: 0; right: 0; top: 100%;
+    display: flex; flex-direction: column; gap: 0;
+    background: #f6f4ef; padding: 12px 5% 24px;
+    border-bottom: 1px solid #d8d3cb;
+    box-shadow: 0 22px 35px rgba(35,38,35,.12);
+    max-height: calc(100dvh - 72px); overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .mobile-menu:not([open]) nav { display: none; }
+  .mobile-menu nav a {
+    display: flex; align-items: center; min-height: 52px; width: 100%;
+    padding: 12px 4px; font-size: 1rem; letter-spacing: .015em;
+    border-bottom: 1px solid #e6e2dc;
+  }
+  .mobile-menu nav a:active { background: #eae5dd; }
+  .mobile-menu nav .mobile-language {
+    margin-top: 8px; font-size: .83rem; color: #726a5e;
+    border-bottom: 0; min-height: 44px;
+  }
+  .hero {
+    min-height: 0; display: grid; grid-template-columns: 1fr;
+    gap: 36px; padding-top: 64px; padding-bottom: 67px;
+  }
+  .hero-copy { max-width: 680px; }
+  h1 { font-size: clamp(3.15rem, 8.8vw, 5.2rem); max-width: 680px; }
+  h2 { font-size: clamp(2.55rem, 7.8vw, 4rem); }
+  .hero-art { width: min(100%,600px); max-height: 520px; aspect-ratio: 4/3.8; }
+  .hero-index { display: none; }
+  .section-pad { padding: 80px 5%; }
+  .hero.section-pad { padding-top: 64px; padding-bottom: 67px; }
+  .section-head { display: block; margin-bottom: 38px; }
+  .section-head > p { margin: 22px 0 0; max-width: 600px; }
+  .art-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 32px 20px; }
+  .art-card:nth-child(3n+2) { padding-top: 0; }
+  .art-frame { aspect-ratio: 4/4.7; }
+  .practice-grid { gap: 24px; }
+  .about-grid { gap: 36px; }
+  .about-grid p { font-size: 1.12rem; }
+}
+@media (max-width: 640px) {
+  html { scroll-padding-top: 70px; }
+  .site-header { min-height: 66px; height: 66px; padding-inline: 5%; }
+  .site-header .brand { letter-spacing: .07em; }
+  .mobile-menu nav { max-height: calc(100dvh - 66px); }
+  .section-pad { padding: 68px 5%; }
+  .hero.section-pad { padding-top: 54px; padding-bottom: 60px; }
+  .eyebrow { font-size: .69rem; letter-spacing: .12em; margin-bottom: 24px; }
+  h1 { font-size: clamp(2.8rem, 11vw, 4.15rem); line-height: 1.1; }
+  h2 { font-size: clamp(2.35rem, 9.3vw, 3.5rem); line-height: 1.17; }
+  .hero { gap: 30px; }
+  .hero .intro { font-size: 1rem; margin: 22px 0 28px; }
+  .hero-art { aspect-ratio: 4/4.4; max-height: none; }
+  .hero-caption { font-size: .53rem; }
+  .primary-link { gap: 22px; font-size: .75rem; max-width: 100%; }
+  .section-head { margin-bottom: 30px; }
+  .section-head > p { font-size: .89rem; }
+  .art-grid { gap: 32px 14px; }
+  .art-info h3 { font-size: .98rem; }
+  .art-info p { font-size: .72rem; }
+  .art-frame { aspect-ratio: 4/5; }
+  .practice-grid { display: grid; grid-template-columns: 1fr; margin-top: 38px; }
+  .practice-grid article { min-height: 0; padding-bottom: 24px; }
+  .practice-grid h3 { font-size: clamp(1.75rem,7vw,2.3rem); margin: 20px 0 12px; }
+  .ex-row { grid-template-columns: 56px minmax(0,1fr) 44px; gap: 12px; }
+  .ex-row h3 { font-size: 1.08rem; }
+  .ex-row p { font-size: .77rem; }
+  .about-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
+  .about-grid p { font-size: 1.06rem; }
+  .contact-pill { max-width: 100%; padding-inline: 16px; line-height: 1.65; }
+  .site-footer { gap: 12px; flex-direction: column; align-items: start; padding: 26px 5%; line-height: 1.5; }
+}
+@media (max-width: 420px) {
+  .mobile-menu > summary { gap: 8px; min-width: 60px; }
+  .menu-label { font-size: .78rem; }
+  .art-grid { grid-template-columns: 1fr; gap: 36px; }
+  .art-frame { aspect-ratio: 4/4.1; }
+  .art-info h3 { font-size: 1.1rem; }
+  .ex-row { grid-template-columns: 48px minmax(0,1fr) 36px; gap: 8px; }
+}
+@media (max-width: 360px) {
+  .site-header .brand { font-size: 1rem; }
+  .mobile-menu > summary { min-width: 52px; }
+  .section-pad { padding-inline: 4.5%; }
+  h1 { font-size: 2.65rem; }
+  h2 { font-size: 2.3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

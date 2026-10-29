@@ -46,3 +46,12 @@ An incremental importer can validate TXT metadata and write a generated catalog 
 ## Editorial verification
 
 Before launch, verify with the artist: biography, work titles, exhibition descriptions, image rights, and contact details. Historical public references to check include the 2026 exhibition at Muzeul Apei in Timișoara and the 2015 “40 / Metafora” exhibition. Artist profile: https://www.facebook.com/sorin.iosub.9/?locale=ro_RO
+
+## Mobile responsive support
+
+- Touch-friendly collapsible navigation (native HTML details + minimal progressive-enhancement script)
+- Dedicated breakpoints at 900, 640, 420 and 360 px; gallery grids adapt from three to two to one column
+- Fluid typography, horizontal-overflow protection, sticky mobile header and safe tap areas
+- Reduced-motion support and visible keyboard focus
+- Both published root HTML pages and Astro source share the same responsive styles
+- Verify on real devices before launch, particularly landscape mode and accessibility with screen readers
