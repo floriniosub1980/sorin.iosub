@@ -10,15 +10,29 @@ npm run dev
 npm run build
 ```
 
-## Deploy with Cloudflare Pages
+## GitHub Pages and custom domain: soriniosub.com
 
-Connect this GitHub repository at **Cloudflare → Workers & Pages → Create → Pages → Connect to Git**.
-- Framework preset: Astro
-- Build command: `npm run build`
-- Output directory: `dist`
-- Root directory: repository root
+The current public preview is a static site in the repository root (`index.html`, `en/`, `ro/`, `style.css`). Configure GitHub repository **Settings → Pages**:
+- Source: `Deploy from a branch`
+- Branch: `main`, folder: `/ (root)`
+- Custom domain: `soriniosub.com` (save; repository-root `CNAME` also declares it)
+- Enable **Enforce HTTPS** once GitHub has verified DNS and issued its TLS certificate.
 
-Set `soriniosub.com` as the custom domain after purchasing and configuring its DNS. This does not happen automatically when committing code.
+In the authoritative DNS zone for `soriniosub.com` at Hostico, use these records:
+
+| Host | Type | Value |
+| --- | --- | --- |
+| `@` | `A` | `185.199.108.153` |
+| `@` | `A` | `185.199.109.153` |
+| `@` | `A` | `185.199.110.153` |
+| `@` | `A` | `185.199.111.153` |
+| `www` | `CNAME` | `floriniosub1980.github.io` |
+
+Preserve any MX/TXT records needed for email and remove conflicting parking/old A or AAAA records for the same host. Some control panels use a blank host rather than `@`. DNS propagation and GitHub TLS provisioning can take time (up to about 24 hours or longer for TLS).
+
+The canonical URLs of the public HTML pages are set to the custom domain. All internal navigation uses relative paths, so the two languages work under the new domain. `public/CNAME` is retained for a future Astro build/deploy workflow; the current Pages source is the root branch.
+
+GitHub Pages is a static site host; artwork inquiry email needs a third-party form service or serverless endpoint. Because this art portfolio includes commercial inquiries, review GitHub Pages usage terms before treating Pages as a permanent commercial deployment. Cloudflare Pages remains the proposed production alternative if needed.
 
 ## Current state
 
