@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import '../styles/responsive.css';
-import { content, works } from '../data/site';
+import { content } from '../data/site';
 const { lang = 'en' } = Astro.props;
 const t = content[lang as 'en' | 'ro'];
 const target = lang === 'en' ? '/ro/' : '/en/';
@@ -45,7 +45,7 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
       <div class="hero-art" aria-label="Abstract graphic design placeholder"><div class="abstract-sun"></div><div class="abstract-arch"></div><div class="abstract-person"></div><span class="hero-caption">SORIN IOSUB / PORTFOLIO STUDY — 01</span></div>
       <div class="hero-index">01 / ARTIST PORTFOLIO</div>
     </section>
-    <section class="work-section section-pad" id="artworks"><div class="section-head"><div><p class="eyebrow">01 / PORTFOLIO</p><h2>{t.workTitle}</h2></div><p>{t.workCopy}</p></div><div class="art-grid">{works.map((work, i) => <article class="art-card"><div class="art-frame" style={'--h:' + work.hue + ';--i:' + i}><span class="abstract-shape"></span><span class="art-marker">{String(i+1).padStart(2,'0')}</span></div><div class="art-info"><div><h3>{work.id}</h3><p>{t.availability}</p></div></div></article>)}</div><p class="notice">{t.disclaimer}</p></section>
+    <section class="work-section section-pad" id="artworks"><div class="section-head"><div><p class="eyebrow">01 / PORTFOLIO</p><h2>{t.workTitle}</h2></div><p>{lang === 'ro' ? 'Lucrări publicate în catalogul artistic, cu informații completate pe măsură ce sunt confirmate.' : 'Works from the artist’s catalogue, with details updated as they are confirmed.'}</p></div><div class="art-grid" data-r2-artworks={lang} aria-busy="true" aria-live="polite"><p class="artwork-message">{lang === 'ro' ? 'Se încarcă lucrările…' : 'Loading artworks…'}</p></div><p class="notice">{lang === 'ro' ? 'Titlurile și detaliile provizorii urmează să fie confirmate de artist.' : 'Provisional titles and details await confirmation by the artist.'}</p></section>
     <section class="practice-section section-pad" id="practice"><p class="eyebrow">02 / PRACTICE</p><h2>{t.practice}</h2><div class="practice-grid"><article><span class="practice-num">01</span><h3>{t.painting}</h3><p>{t.paintingCopy}</p></article><article><span class="practice-num">02</span><h3>{t.fresco}</h3><p>{t.frescoCopy}</p></article></div></section>
     <section class="exhibition-section section-pad" id="exhibitions"><div class="section-head"><div><p class="eyebrow">03 / ARCHIVE</p><h2>{t.exhibitions}</h2></div><p>{t.exhibitionsCopy}</p></div><div class="ex-row"><span>2026</span><div><h3>{t.ex1}</h3><p>{t.ex1copy}</p></div><a href="https://www.google.com/search?q=Sorin+Iosub+Muzeul+Apei+2026" target="_blank" rel="noopener noreferrer" aria-label={t.source + ' 2026'}>{t.source}</a></div><div class="ex-row"><span>2015</span><div><h3>{t.ex2}</h3><p>{t.ex2copy}</p></div><a href="https://www.google.com/search?q=Sorin+Iosub+40+Metafora+2015" target="_blank" rel="noopener noreferrer" aria-label={t.source + ' 2015'}>{t.source}</a></div></section>
     <section class="about-section section-pad" id="about"><p class="eyebrow">04 / ARTIST</p><div class="about-grid"><h2>{t.about}</h2><p>{t.aboutText}</p></div></section>
@@ -53,5 +53,6 @@ const ids = ['artworks','practice','exhibitions','about','contact'];
   </main>
   <footer class="site-footer"><span>© {new Date().getFullYear()} SORIN IOSUB</span><span>{t.rights}</span><a href="#content">{lang === 'ro' ? 'Sus' : 'Top'}</a></footer>
   <script src="/mobile.js" is:inline defer></script>
+  <script src="/gallery.js" is:inline defer></script>
 </body>
 </html>
