@@ -162,3 +162,11 @@
 @media (prefers-reduced-motion: reduce) {
   .art-lightbox-image { transition: none; }
 }
+
+/* Artist's actual portrait replaces the decorative illustration as soon as R2 serves the image. */
+.hero-art .hero-portrait{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;z-index:1;transition:opacity .2s ease}
+.hero-art--loaded{aspect-ratio:720 / 484;max-height:none;background:#ebe5dd}
+.hero-art--loaded .hero-portrait{opacity:1}
+.hero-art--loaded .abstract-sun,.hero-art--loaded .abstract-arch,.hero-art--loaded .abstract-person{display:none}
+.hero-art--loaded .hero-caption{background:rgba(25,28,27,.72);color:#fff;padding:8px 10px;max-width:calc(100% - 30px);line-height:1.4}
+@media(prefers-reduced-motion:reduce){.hero-art .hero-portrait{transition:none}}
