@@ -16,3 +16,149 @@
 .art-grid .artwork-message{grid-column:1/-1;margin:0;color:#65665f}
 .art-grid .artwork-retry{justify-self:start;grid-column:1/-1;background:transparent;border:1px solid #9b533e;padding:11px 18px;color:#242622;font:inherit;cursor:pointer}
 .art-grid .artwork-retry:hover{background:#eee6dd}
+
+
+/* R2 artwork gallery: natural proportions, collection filters, accessible lightbox. */
+.art-grid .real-artwork {
+  aspect-ratio: auto;
+  height: auto;
+  display: block;
+  background: transparent;
+}
+.art-grid .real-artwork::before { content: none; }
+.art-grid .real-artwork img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+  object-fit: contain;
+}
+.art-grid .real-artwork:hover img { filter: brightness(.96); }
+.artwork-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: -12px 0 36px;
+}
+.artwork-filters[hidden] { display: none; }
+.artwork-filter {
+  border: 1px solid #bcb7ad;
+  background: transparent;
+  border-radius: 100px;
+  padding: 10px 16px;
+  min-height: 42px;
+  color: #383a35;
+  font: 500 .8rem 'DM Sans', sans-serif;
+  cursor: pointer;
+}
+.artwork-filter:hover { border-color: #5c5a51; }
+.artwork-filter[aria-pressed="true"] {
+  background: #292d2c;
+  border-color: #292d2c;
+  color: #fff;
+}
+.artwork-filter:focus-visible,
+.art-lightbox-button:focus-visible { outline: 3px solid #b58b67; outline-offset: 3px; }
+.art-lightbox {
+  border: 0;
+  padding: 0;
+  margin: auto;
+  width: min(96vw, 1320px);
+  max-width: none;
+  max-height: none;
+  height: min(95dvh, 900px);
+  background: #1f2221;
+  color: #f5f3ed;
+  box-shadow: 0 20px 80px rgba(0,0,0,.4);
+  overflow: hidden;
+}
+.art-lightbox::backdrop { background: rgba(10,12,11,.88); }
+.art-lightbox-panel {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr) auto;
+}
+.art-lightbox-top {
+  min-height: 58px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px 8px 24px;
+}
+.art-lightbox-counter {
+  color: #d4d1c9;
+  font-size: .8rem;
+  letter-spacing: .06em;
+}
+.art-lightbox-button {
+  border: 1px solid rgba(255,255,255,.24);
+  background: rgba(32,35,33,.88);
+  color: #fff;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+.art-lightbox-button:hover:not(:disabled) { background: #464a46; }
+.art-lightbox-button:disabled { opacity: .32; cursor: default; }
+.art-lightbox-close { font-size: 1.8rem; }
+.art-lightbox-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 58px minmax(0,1fr) 58px;
+  align-items: stretch;
+}
+.art-lightbox-prev,
+.art-lightbox-next {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 2.5rem;
+}
+.art-lightbox-image-area {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.art-lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transform-origin: center center;
+  transition: transform .16s ease;
+}
+.art-lightbox-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 24px 18px;
+}
+.art-lightbox-caption { min-width: 0; }
+.art-lightbox-caption h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.2rem; }
+.art-lightbox-caption p { margin: 5px 0 0; font-size: .76rem; color: #cac9c3; }
+.art-lightbox-zoom { display: flex; gap: 8px; flex: 0 0 auto; }
+.art-lightbox-reset { font-size: .8rem; min-width: 62px; }
+@media (max-width: 640px) {
+  .artwork-filters { gap: 8px; margin: 0 0 28px; }
+  .artwork-filter { padding: 9px 12px; font-size: .74rem; min-height: 40px; }
+  .art-lightbox { width: 100vw; height: 100dvh; }
+  .art-lightbox-stage { grid-template-columns: 42px minmax(0,1fr) 42px; }
+  .art-lightbox-prev, .art-lightbox-next { padding: 0; min-width: 42px; }
+  .art-lightbox-bottom { padding: 12px; flex-wrap: wrap; }
+  .art-lightbox-caption h3 { font-size: 1rem; }
+  .art-lightbox-counter { font-size: .73rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .art-lightbox-image { transition: none; }
+}
