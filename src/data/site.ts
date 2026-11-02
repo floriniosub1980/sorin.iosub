@@ -1,4 +1,3 @@
-export const works = Array.from({ length: 6 }, (_, index) => ({ id: 'SI-' + String(index + 1).padStart(4, '0'), hue: [29, 185, 320, 48, 209, 14][index] }));
 export const content = {
   en: {
     nav: ['Artworks','Practice','Exhibitions','About','Contact'],
@@ -7,7 +6,7 @@ export const content = {
     heroCopy: 'An evolving portfolio of paintings, artistic projects and exhibitions by Sorin Iosub.',
     explore: 'Explore the portfolio',
     workTitle: 'Selected artworks',
-    workCopy: 'The gallery is in preparation. Photographs and verified artwork details will be added with the artist’s approval.',
+    workCopy: 'Works from the artist’s catalogue, with details updated as they are confirmed.',
     practice: 'Artistic practice',
     painting: 'Painting & drawing',
     paintingCopy: 'An archive of individual works, series and studies.',
@@ -26,7 +25,7 @@ export const content = {
     contactButton: 'Contact details coming soon',
     availability: 'Details to be confirmed',
     rights: 'Artwork imagery remains the property of its respective rights holders.',
-    disclaimer: 'Visual placeholders — not reproductions of Sorin Iosub’s artworks.',
+    disclaimer: 'Provisional titles and details await confirmation by the artist.',
     source: 'Source', language: 'Română',
   },
   ro: {
@@ -36,7 +35,7 @@ export const content = {
     heroCopy: 'Un portofoliu în dezvoltare cu picturi, proiecte artistice și expoziții semnate de Sorin Iosub.',
     explore: 'Descoperă portofoliul',
     workTitle: 'Lucrări selectate',
-    workCopy: 'Galeria este în pregătire. Fotografiile și metadatele validate vor fi publicate cu acordul artistului.',
+    workCopy: 'Lucrări publicate în catalogul artistic, cu informații completate pe măsură ce sunt confirmate.',
     practice: 'Practica artistică',
     painting: 'Pictură și desen',
     paintingCopy: 'Arhivă de lucrări individuale, serii și studii.',
@@ -55,7 +54,7 @@ export const content = {
     contactButton: 'Datele de contact vor fi adăugate',
     availability: 'Detalii în curs de confirmare',
     rights: 'Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor.',
-    disclaimer: 'Elemente grafice demonstrative — nu sunt reproduceri ale lucrărilor lui Sorin Iosub.',
+    disclaimer: 'Titlurile și detaliile provizorii urmează să fie confirmate de artist.',
     source: 'Sursa', language: 'English',
   }
 } as const;
