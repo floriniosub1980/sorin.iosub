@@ -1,6 +1,16 @@
 /* Bilingual R2 catalogue, category filters and accessible artwork lightbox. */
 (() => {
   'use strict';
+
+  // Keep the original illustration as a fallback until the R2 hero image is available.
+  const portrait = document.querySelector('.hero-portrait');
+  if (portrait) {
+    const reveal = () => {
+      if (portrait.naturalWidth > 0) portrait.closest('.hero-art')?.classList.add('hero-art--loaded');
+    };
+    portrait.addEventListener('load', reveal);
+    if (portrait.complete) reveal();
+  }
   const grid = document.querySelector('[data-r2-artworks]');
   if (!grid) return;
 
