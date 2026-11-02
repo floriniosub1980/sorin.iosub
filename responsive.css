@@ -183,3 +183,20 @@ html { scroll-padding-top: 110px; }
 @media (max-width: 360px) {
   .ex-row { grid-template-columns: 42px minmax(0, 1fr) max-content; }
 }
+
+/* Reduce the whitespace between the introductory hero and portfolio gallery. */
+.hero.section-pad {
+  min-height: 0;
+  padding-bottom: 20px;
+}
+.work-section.section-pad {
+  padding-top: 28px;
+}
+@media (max-width: 900px) {
+  .hero.section-pad { padding-bottom: 18px; }
+  .work-section.section-pad { padding-top: 26px; }
+}
+@media (max-width: 640px) {
+  .hero.section-pad { padding-bottom: 14px; }
+  .work-section.section-pad { padding-top: 22px; }
+}
