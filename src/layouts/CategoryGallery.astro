@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import '../styles/responsive.css';
+import { content } from '../data/site';
+const { lang = 'en', kind = 'painting' } = Astro.props;
+const t = content[lang as 'en' | 'ro'];
+const routes = {
+  en: { painting: '/en/painting-drawing/', fresco: '/en/frescoes-monumental/' },
+  ro: { painting: '/ro/pictura-desen/', fresco: '/ro/fresce-monumentale/' }
+};
+const otherLang = lang === 'en' ? 'ro' : 'en';
+const home = '/' + lang + '/';
+const alternate = routes[otherLang as 'en' | 'ro'][kind as 'painting' | 'fresco'];
+const title = kind === 'painting' ? t.painting : t.fresco;
+const description = kind === 'painting'
+  ? (lang === 'ro' ? 'Picturi, desene, lucrări de grafică, serii și studii realizate de Sorin Iosub.' : 'Paintings, drawings, graphics, series and studies by Sorin Iosub.')
+  : (lang === 'ro' ? 'Fresce și proiecte de artă monumentală realizate de Sorin Iosub.' : 'Frescoes and monumental art projects by Sorin Iosub.');
+const scope = kind === 'painting' ? 'paintings,graphics' : 'frescoes';
+const ids = ['artworks', 'practice', 'exhibitions', 'about', 'contact'];
+---
+<!doctype html>
+<html lang={lang}>
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>{title} — Sorin Iosub</title>
+<meta name="description" content={description} /><meta name="theme-color" content="#f6f4ef" />
+<link rel="canonical" href={'https://soriniosub.com' + routes[lang as 'en'|'ro'][kind as 'painting'|'fresco']} />
+<link rel="alternate" hreflang="en" href={'https://soriniosub.com' + routes.en[kind as 'painting'|'fresco']} />
+<link rel="alternate" hreflang="ro" href={'https://soriniosub.com' + routes.ro[kind as 'painting'|'fresco']} />
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+<a class="skip" href="#content">{lang === 'ro' ? 'Sari la conținut' : 'Skip to content'}</a>
+<header class="site-header">
+<a class="brand" href={home} aria-label="Sorin Iosub">SORIN <span>IOSUB</span></a>
+<nav aria-label={lang === 'ro' ? 'Navigare principală' : 'Main navigation'}>{t.nav.map((item, i) => <a href={home + '#' + ids[i]}>{item}</a>)}</nav>
+<a class="lang" href={alternate}><img class="language-flag" src={lang === 'ro' ? '/flags/gb.svg' : '/flags/ro.svg'} width="22" height="15" alt="" aria-hidden="true" /> {t.language}</a>
+<details class="mobile-menu">
+<summary aria-label={lang === 'ro' ? 'Deschide sau închide meniul' : 'Open or close navigation'}><span class="menu-label">{lang === 'ro' ? 'Meniu' : 'Menu'}</span><span class="menu-lines" aria-hidden="true"><span></span><span></span></span></summary>
+<nav aria-label={lang === 'ro' ? 'Navigare mobilă' : 'Mobile navigation'}>
+{t.nav.map((item, i) => <a href={home + '#' + ids[i]}>{item}</a>)}
+<a class="mobile-language" href={alternate}><img class="language-flag" src={lang === 'ro' ? '/flags/gb.svg' : '/flags/ro.svg'} width="22" height="15" alt="" aria-hidden="true" /> {t.language}</a>
+</nav></details>
+</header>
+<main id="content" class="category-page">
+<section class="category-intro section-pad">
+<a class="category-back" href={home + '#practice'}>{lang === 'ro' ? 'Înapoi la practica artistică' : 'Back to artistic practice'}</a>
+<p class="eyebrow">02 / {lang === 'ro' ? 'PRACTICĂ ARTISTICĂ' : 'ARTISTIC PRACTICE'}</p>
+<h1>{title}</h1><p class="category-description">{description}</p>
+<nav class="category-switch" aria-label={t.practice}>
+<a href={routes[lang as 'en'|'ro'].painting} aria-current={kind === 'painting' ? 'page' : undefined}>{t.painting}</a>
+<a href={routes[lang as 'en'|'ro'].fresco} aria-current={kind === 'fresco' ? 'page' : undefined}>{t.fresco}</a>
+</nav>
+</section>
+<section class="work-section section-pad" id="artworks">
+<div class="section-head"><div><p class="eyebrow">{title}</p><h2>{lang === 'ro' ? 'Lucrări publicate' : 'Published works'}</h2></div><p>{lang === 'ro' ? 'Lucrările din catalog apar automat aici pe măsură ce sunt publicate.' : 'Artworks from the catalogue are displayed here automatically as they are published.'}</p></div>
+<div class="art-grid" data-r2-artworks={lang} data-r2-categories={scope} aria-busy="true" aria-live="polite"><p class="artwork-message">{lang === 'ro' ? 'Se încarcă lucrările…' : 'Loading artworks…'}</p></div>
+<p class="notice">{lang === 'ro' ? 'Titlurile și detaliile lucrărilor sunt actualizate pe măsură ce sunt confirmate de artist.' : 'Artwork titles and details are updated as they are confirmed by the artist.'}</p>
+</section>
+</main>
+<footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span>{t.rights}</span><a href="#content">{lang === 'ro' ? 'Sus' : 'Top'}</a></footer>
+<script src="/mobile.js" is:inline defer></script><script src="/gallery.js" is:inline defer></script>
+</body>
+</html>

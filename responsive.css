@@ -200,3 +200,18 @@ html { scroll-padding-top: 110px; }
   .hero.section-pad { padding-bottom: 14px; }
   .work-section.section-pad { padding-top: 22px; }
 }
+
+/* Dedicated category pages: compact spacing across mobile and tablet. */
+@media (max-width: 900px) {
+  .category-page .category-intro.section-pad { padding-top: 55px; padding-bottom: 22px; }
+  .category-page .category-back { margin-bottom: 30px; }
+  .category-page .work-section.section-pad { padding-top: 18px; padding-bottom: 65px; }
+}
+@media (max-width: 640px) {
+  .category-page .category-intro.section-pad { padding-top: 40px; padding-bottom: 18px; }
+  .category-page .category-intro h1 { font-size: clamp(2.65rem, 10vw, 4.1rem); }
+  .category-page .category-description { font-size: .97rem; margin-top: 20px; }
+  .category-page .category-switch { gap: 8px; margin-top: 24px; }
+  .category-page .category-switch a { font-size: .76rem; padding: 9px 12px; }
+  .category-page .work-section.section-pad { padding-top: 15px; padding-bottom: 54px; }
+}

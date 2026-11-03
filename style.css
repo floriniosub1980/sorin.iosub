@@ -169,3 +169,38 @@
 .hero-art--loaded .hero-portrait{opacity:1}
 .hero-art--loaded .abstract-sun,.hero-art--loaded .abstract-arch,.hero-art--loaded .abstract-person{display:none}
 @media(prefers-reduced-motion:reduce){.hero-art .hero-portrait{transition:none}}
+
+/* Dedicated R2 category galleries and links from Artistic practice. */
+.practice-grid .practice-gallery-link { color: inherit; text-decoration: none; }
+.practice-grid .practice-gallery-link:hover,
+.practice-grid .practice-gallery-link:focus-visible { text-decoration: underline; text-underline-offset: 6px; }
+.practice-grid .practice-cta {
+  display: inline-block; margin-top: 20px; color: #f8f4ed;
+  font: 500 .78rem 'DM Sans', sans-serif; letter-spacing: .04em;
+  border-bottom: 1px solid #b8b9b2; padding-bottom: 7px;
+}
+.practice-grid .practice-cta:hover { border-bottom-color: #fff; }
+.practice-grid .practice-cta:focus-visible { outline: 3px solid #d8b48d; outline-offset: 4px; }
+.category-page .category-intro.section-pad { padding-top: 78px; padding-bottom: 32px; }
+.category-page .category-back {
+  display: inline-block; font-size: .79rem; text-decoration: underline;
+  text-underline-offset: 4px; margin-bottom: 42px; color: #66675e;
+}
+.category-page .category-intro h1 { max-width: 960px; font-size: clamp(3rem, 6vw, 6rem); }
+.category-page .category-description { max-width: 730px; margin: 28px 0 0; color: #68685f; font-size: 1.06rem; }
+.category-page .category-switch {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+  margin-top: 32px;
+}
+.category-page .category-switch a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px;
+  border: 1px solid #bcb7ad; border-radius: 100px;
+  font-size: .8rem; color: #383a35; text-decoration: none;
+}
+.category-page .category-switch a:hover { border-color: #5c5a51; }
+.category-page .category-switch a[aria-current="page"] {
+  background: #292d2c; border-color: #292d2c; color: #fff;
+}
+.category-page .category-switch a:focus-visible { outline: 3px solid #9b533e; outline-offset: 3px; }
+.category-page .work-section.section-pad { padding-top: 26px; padding-bottom: 85px; }
+.category-page .section-head { margin-bottom: 34px; }

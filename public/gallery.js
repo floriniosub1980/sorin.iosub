@@ -41,7 +41,11 @@
     }
   }[lang];
 
-  const categories = ['all', 'paintings', 'frescoes', 'graphics'];
+  // Optional page scope: the main portfolio stays unfiltered, category pages reuse this same catalogue.
+  const allowed = ['paintings', 'frescoes', 'graphics'];
+  const scope = [...new Set((grid.dataset.r2Categories || '').split(',')
+    .map(value => value.trim().toLowerCase()).filter(value => allowed.includes(value)))];
+  const categories = ['all', ...(scope.length ? scope : allowed)];
   const pick = value => typeof value === 'string' ? value :
     value && typeof value === 'object' ? (value[lang] || value.en || value.ro || '') : '';
 
@@ -268,7 +272,7 @@
       ? allWorks : allWorks.filter(item => item._category === selectedCategory);
     grid.replaceChildren();
     if (!visibleWorks.length) {
-      showNotice(selectedCategory === 'all' ? l.empty : l.noResults, false);
+      showNotice(selectedCategory === 'all' && !scope.length ? l.empty : l.noResults, false);
     } else {
       visibleWorks.forEach((work, index) => grid.append(makeCard(work, index)));
       grid.setAttribute('aria-busy', 'false');
@@ -289,7 +293,7 @@
       button.setAttribute('aria-pressed', String(selectedCategory === category));
       filters.append(button);
     }
-    filters.hidden = allWorks.length === 0;
+    filters.hidden = allWorks.length === 0 || categories.length <= 2;
   }
 
   async function load() {
@@ -310,7 +314,8 @@
           _thumbnail: mediaUrl(work.images && work.images.thumbnail),
           _full: mediaUrl(work.images && work.images.full)
         }))
-        .filter(work => work._thumbnail && work._full);
+        .filter(work => work._thumbnail && work._full)
+        .filter(work => !scope.length || scope.includes(work._category));
       selectedCategory = 'all';
       renderFilters();
       renderGrid();
