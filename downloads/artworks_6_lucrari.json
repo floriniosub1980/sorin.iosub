@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "artworks": [
+    {
+      "id": "lucrare-001",
+      "slug": "lucrare-001",
+      "title": {
+        "ro": "Lucrare 001 (titlu provizoriu)",
+        "en": "Artwork 001 (provisional title)"
+      },
+      "category": "paintings",
+      "year": 2010,
+      "technique": {
+        "ro": "Acril",
+        "en": "Acril"
+      },
+      "dimensionsCm": {
+        "width": 100,
+        "height": 100
+      },
+      "description": {
+        "ro": "Compoziție picturală bogată în detalii, cu elemente figurative și abstracte, în tonuri de albastru, portocaliu și roșu.",
+        "en": "A richly detailed pictorial composition combining figurative and abstract elements in shades of blue, orange and red."
+      },
+      "alt": {
+        "ro": "Compoziție multicoloră cu personaje, obiecte și forme abstracte într-un ansamblu dens.",
+        "en": "Multicoloured composition with figures, objects and abstract shapes in a dense arrangement."
+      },
+      "images": {
+        "thumbnail": "https://media.soriniosub.com/artworks/paintings/lucrare-001/thumbnail.webp",
+        "full": "https://media.soriniosub.com/artworks/paintings/lucrare-001/full.webp"
+      },
+      "availability": "unconfirmed",
+      "metadataStatus": "pending_artist_confirmation",
+      "published": true
+    },
+    {
+      "id": "si-0002",
+      "slug": "si-0002",
+      "title": {
+        "ro": "SI-0002 (titlu provizoriu)",
+        "en": "SI-0002 (provisional title)"
+      },
+      "category": "paintings",
+      "year": null,
+      "technique": {
+        "ro": null,
+        "en": null
+      },
+      "dimensionsCm": {
+        "width": null,
+        "height": null
+      },
+      "description": {
+        "ro": "Compoziție densă, dominată de roșu și negru, cu personaje, simboluri și forme ornamentale.",
+        "en": "A densely layered composition dominated by red and black, with figures, symbols and ornamental forms."
+      },
+      "alt": {
+        "ro": "Pictură panoramică cu numeroase personaje și simboluri în tonuri intense de roșu și negru.",
+        "en": "Panoramic painting featuring numerous figures and symbols in deep red and black tones."
+      },
+      "availability": "unconfirmed",
+      "metadataStatus": "pending_artist_confirmation",
+      "published": true,
+      "images": {
+        "thumbnail": "https://media.soriniosub.com/artworks/paintings/si-0002/thumbnail.webp",
+        "full": "https://media.soriniosub.com/artworks/paintings/si-0002/full.webp"
+      }
+    },
+    {
+      "id": "si-0033",
+      "slug": "si-0033",
+      "title": {
+        "ro": "SI-0033 — studiu de figură (titlu provizoriu)",
+        "en": "SI-0033 — figure study (provisional title)"
+      },
+      "category": "graphics",
+      "year": 2026,
+      "technique": {
+        "ro": null,
+        "en": null
+      },
+      "dimensionsCm": {
+        "width": null,
+        "height": null
+      },
+      "description": {
+        "ro": "Studiu de figură feminină așezată, realizat prin linii fine și accente discrete de culoare pe hârtie.",
+        "en": "A study of a seated female figure, rendered with fine lines and subtle colour accents on paper."
+      },
+      "alt": {
+        "ro": "Desen de figură feminină așezată, cu contururi subțiri, păr întunecat și accente de culoare estompată.",
+        "en": "Drawing of a seated female figure with fine outlines, dark hair and muted colour accents."
+      },
+      "images": {
+        "thumbnail": "https://media.soriniosub.com/artworks/graphics/si-0033/thumbnail.webp",
+        "full": "https://media.soriniosub.com/artworks/graphics/si-0033/full.webp"
+      },
+      "availability": "unconfirmed",
+      "metadataStatus": "pending_artist_confirmation",
+      "published": true
+    },
+    {
+      "id": "si-0004",
+      "slug": "si-0004",
+      "title": {
+        "ro": "SI-0004 — pasăre (titlu provizoriu)",
+        "en": "SI-0004 — bird (provisional title)"
+      },
+      "category": "graphics",
+      "year": 2026,
+      "technique": {
+        "ro": null,
+        "en": null
+      },
+      "dimensionsCm": {
+        "width": null,
+        "height": null
+      },
+      "description": {
+        "ro": "Reprezentare expresivă a unei păsări cu penaj multicolor și coadă lungă, combinând tușe de culoare cu desenul în linie.",
+        "en": "An expressive depiction of a bird with multicoloured plumage and a long tail, combining colour washes with line drawing."
+      },
+      "alt": {
+        "ro": "Desen de pasăre cu cap roșu, gât întunecat, corp ocru și coadă lungă, pe fundal alb.",
+        "en": "Drawing of a bird with a red head, dark neck, ochre body and long tail against a white background."
+      },
+      "images": {
+        "thumbnail": "https://media.soriniosub.com/artworks/graphics/si-0004/thumbnail.webp",
+        "full": "https://media.soriniosub.com/artworks/graphics/si-0004/full.webp"
+      },
+      "availability": "unconfirmed",
+      "metadataStatus": "pending_artist_confirmation",
+      "published": true
+    },
+    {
+      "id": "si-0005",
+      "slug": "si-0005",
+      "title": {
+        "ro": "SI-0005 — pictură murală (titlu provizoriu)",
+        "en": "SI-0005 — mural painting (provisional title)"
+      },
+      "category": "frescoes",
+      "year": null,
+      "technique": {
+        "ro": null,
+        "en": null
+      },
+      "dimensionsCm": {
+        "width": null,
+        "height": null
+      },
+      "description": {
+        "ro": "Ansamblu de pictură murală religioasă cu Maica Domnului și Pruncul, îngeri și sfinți, organizat în registre decorative.",
+        "en": "A religious mural ensemble depicting the Virgin and Child, angels and saints, arranged in decorative registers."
+      },
+      "alt": {
+        "ro": "Interior cu pictură murală bisericească reprezentând Maica Domnului cu Pruncul și mai mulți sfinți.",
+        "en": "Church interior mural depicting the Virgin and Child and several saints."
+      },
+      "images": {
+        "thumbnail": "https://media.soriniosub.com/artworks/frescoes/si-0005/thumbnail.webp",
+        "full": "https://media.soriniosub.com/artworks/frescoes/si-0005/full.webp"
+      },
+      "availability": "unconfirmed",
+      "metadataStatus": "pending_artist_confirmation",
+      "published": true
+    },
+    {
+      "id": "si-0006",
+      "slug": "si-0006",
+      "title": {
+        "ro": "SI-0006 — pictură monumentală (titlu provizoriu)",
+        "en": "SI-0006 — monumental painting (provisional title)"
+      },
+      "category": "frescoes",
+      "year": null,
+      "technique": {
+        "ro": null,
+        "en": null
+      },
+      "dimensionsCm": {
+        "width": null,
+        "height": null
+      },
+      "description": {
+        "ro": "Pictură monumentală cu scene biblice, medalion central cu Hristos și personaje religioase, pe un fundal albastru intens.",
+        "en": "Monumental painting featuring biblical scenes, a central medallion with Christ and religious figures against a deep blue background."
+      },
+      "alt": {
+        "ro": "Pictură murală de boltă cu Hristos într-un medalion central, înconjurat de scene și personaje biblice.",
+        "en": "Vault mural with Christ in a central medallion surrounded by biblical scenes and figures."
+      },
+      "images": {
+        "thumbnail": "https://media.soriniosub.com/artworks/frescoes/si-0006/thumbnail.webp",
+        "full": "https://media.soriniosub.com/artworks/frescoes/si-0006/full.webp"
+      },
+      "availability": "unconfirmed",
+      "metadataStatus": "pending_artist_confirmation",
+      "published": true
+    }
+  ]
+}
