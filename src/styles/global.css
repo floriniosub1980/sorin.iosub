@@ -277,3 +277,16 @@
 .art-lightbox-image-area.is-dragging .art-lightbox-image {
   transition: none;
 }
+
+/* Contact details are now live mailto/tel links in both languages. */
+.contact-section > p a[href^="mailto:"],
+.contact-section > p a[href^="tel:"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+.contact-section > p a[href^="mailto:"]:focus-visible,
+.contact-section > p a[href^="tel:"]:focus-visible {
+  outline: 3px solid #9b533e;
+  outline-offset: 3px;
+}

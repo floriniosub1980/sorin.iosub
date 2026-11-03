@@ -42,7 +42,7 @@
   }[lang];
 
   // Optional page scope: the main portfolio stays unfiltered, category pages reuse this same catalogue.
-  const allowed = ['paintings', 'frescoes', 'graphics'];
+  const allowed = ['paintings', 'graphics', 'frescoes'];
   const scope = [...new Set((grid.dataset.r2Categories || '').split(',')
     .map(value => value.trim().toLowerCase()).filter(value => allowed.includes(value)))];
   const categories = ['all', ...(scope.length ? scope : allowed)];
