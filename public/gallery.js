@@ -115,6 +115,8 @@
   let activePointerId = null;
   let pointerX = 0;
   let pointerY = 0;
+  const touchPoints = new Map();
+  let pinchBase = null;
   let modalTitle;
   let modalDetails;
   let modalCounter;
@@ -178,7 +180,49 @@
     zoomResetButton.textContent = Math.round(zoom * 100) + '%';
   }
 
+  function focusPoint(x, y) {
+    const box = imageArea.getBoundingClientRect();
+    return { x: x - box.left - box.width / 2, y: y - box.top - box.height / 2 };
+  }
+
+  function zoomAt(value, focus) {
+    const next = Math.max(1, Math.min(3, Math.round(value * 1000) / 1000));
+    const ratio = next / zoom;
+    panX = next === 1 ? 0 : focus.x - (focus.x - panX) * ratio;
+    panY = next === 1 ? 0 : focus.y - (focus.y - panY) * ratio;
+    zoom = next;
+    applyTransform();
+    zoomOutButton.disabled = zoom <= 1;
+    zoomInButton.disabled = zoom >= 3;
+    zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+  }
+
+  function touchGeometry() {
+    if (touchPoints.size !== 2) return null;
+    const [a, b] = [...touchPoints.values()];
+    return {
+      distance: Math.hypot(b.x - a.x, b.y - a.y),
+      x: (a.x + b.x) / 2, y: (a.y + b.y) / 2
+    };
+  }
+
   function onPanStart(event) {
+    if (event.pointerType === 'touch') {
+      if (touchPoints.size >= 2) return;
+      touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      imageArea.setPointerCapture(event.pointerId);
+      if (touchPoints.size === 2) {
+        const g = touchGeometry();
+        pinchBase = g && g.distance > 3 ? { ...g, zoom, panX, panY } : null;
+        imageArea.classList.remove('is-dragging');
+      } else {
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        if (zoom > 1) imageArea.classList.add('is-dragging');
+      }
+      event.preventDefault();
+      return;
+    }
     if (zoom <= 1 || activePointerId !== null || (event.pointerType === 'mouse' && event.button !== 0)) return;
     activePointerId = event.pointerId;
     pointerX = event.clientX;
@@ -189,6 +233,33 @@
   }
 
   function onPanMove(event) {
+    if (touchPoints.has(event.pointerId)) {
+      const previous = touchPoints.get(event.pointerId);
+      touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (touchPoints.size === 2) {
+        const g = touchGeometry();
+        if (!pinchBase && g.distance > 3) pinchBase = { ...g, zoom, panX, panY };
+        if (pinchBase) {
+          const next = Math.max(1, Math.min(3, Math.round(pinchBase.zoom * g.distance / pinchBase.distance * 1000) / 1000));
+          const initial = focusPoint(pinchBase.x, pinchBase.y);
+          const current = focusPoint(g.x, g.y);
+          const ratio = next / pinchBase.zoom;
+          panX = next === 1 ? 0 : current.x - (initial.x - pinchBase.panX) * ratio;
+          panY = next === 1 ? 0 : current.y - (initial.y - pinchBase.panY) * ratio;
+          zoom = next;
+          applyTransform();
+          zoomOutButton.disabled = zoom <= 1;
+          zoomInButton.disabled = zoom >= 3;
+          zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+        }
+      } else if (zoom > 1) {
+        panX += event.clientX - previous.x;
+        panY += event.clientY - previous.y;
+        applyTransform();
+      }
+      event.preventDefault();
+      return;
+    }
     if (activePointerId !== event.pointerId) return;
     panX += event.clientX - pointerX;
     panY += event.clientY - pointerY;
@@ -199,15 +270,45 @@
   }
 
   function onPanEnd(event) {
+    if (touchPoints.delete(event.pointerId)) {
+      pinchBase = null;
+      const remaining = [...touchPoints.values()][0];
+      if (remaining) { pointerX = remaining.x; pointerY = remaining.y; }
+      imageArea.classList.toggle('is-dragging', touchPoints.size === 1 && zoom > 1);
+      if (imageArea.hasPointerCapture(event.pointerId)) imageArea.releasePointerCapture(event.pointerId);
+      return;
+    }
     if (activePointerId !== event.pointerId) return;
     activePointerId = null;
     imageArea.classList.remove('is-dragging');
     if (imageArea.hasPointerCapture(event.pointerId)) imageArea.releasePointerCapture(event.pointerId);
   }
 
+  function clearGestures() {
+    for (const id of touchPoints.keys()) {
+      if (imageArea.hasPointerCapture(id)) imageArea.releasePointerCapture(id);
+    }
+    touchPoints.clear();
+    pinchBase = null;
+    if (activePointerId !== null && imageArea.hasPointerCapture(activePointerId)) {
+      imageArea.releasePointerCapture(activePointerId);
+    }
+    activePointerId = null;
+    imageArea.classList.remove('is-dragging');
+  }
+
+  function onWheelZoom(event) {
+    if (!modal || !modal.open) return;
+    event.preventDefault();
+    const pixels = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? imageArea.clientHeight : 1);
+    const factor = Math.exp(-Math.max(-600, Math.min(600, pixels)) * 0.0018);
+    zoomAt(zoom * factor, focusPoint(event.clientX, event.clientY));
+  }
+
   function showModalImage() {
     const work = visibleWorks[currentIndex];
     if (!work || !modal) return;
+    clearGestures();
     modalImage.src = work._full;
     modalImage.alt = pick(work.alt) || pick(work.title) || '';
     modalTitle.textContent = pick(work.title) || work.id || (lang === 'ro' ? 'Fără titlu' : 'Untitled');
@@ -248,6 +349,7 @@
     imageArea.addEventListener('pointermove', onPanMove);
     imageArea.addEventListener('pointerup', onPanEnd);
     imageArea.addEventListener('pointercancel', onPanEnd);
+    imageArea.addEventListener('wheel', onWheelZoom, { passive: false });
     imageArea.addEventListener('lostpointercapture', event => {
       if (activePointerId === event.pointerId) onPanEnd(event);
     });
@@ -287,6 +389,7 @@
       if (event.target === modal) modal.close();
     });
     modal.addEventListener('close', () => {
+      clearGestures();
       document.body.style.overflow = previousOverflow;
       modalImage.removeAttribute('src');
       zoomTo(1);
