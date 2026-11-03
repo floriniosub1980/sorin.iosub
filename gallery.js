@@ -109,6 +109,12 @@
   let selectedCategory = 'all';
   let modal;
   let modalImage;
+  let imageArea;
+  let panX = 0;
+  let panY = 0;
+  let activePointerId = null;
+  let pointerX = 0;
+  let pointerY = 0;
   let modalTitle;
   let modalDetails;
   let modalCounter;
@@ -130,13 +136,73 @@
     grid.setAttribute('aria-busy', 'false');
   }
 
+  // At 100%, the whole artwork is fitted inside the viewer (not shown at native pixel size).
+  // Pan values are expressed in viewport pixels and clamped to the artwork's visible bounds.
+  function panLimits() {
+    if (!modalImage || !imageArea || !modalImage.naturalWidth || !modalImage.naturalHeight) {
+      return { x: 0, y: 0 };
+    }
+    const width = imageArea.clientWidth;
+    const height = imageArea.clientHeight;
+    if (!width || !height) return { x: 0, y: 0 };
+    const fit = Math.min(width / modalImage.naturalWidth, height / modalImage.naturalHeight);
+    return {
+      x: Math.max(0, (modalImage.naturalWidth * fit * zoom - width) / 2),
+      y: Math.max(0, (modalImage.naturalHeight * fit * zoom - height) / 2)
+    };
+  }
+
+  function applyTransform() {
+    if (!modalImage || !imageArea) return;
+    const limits = panLimits();
+    panX = Math.max(-limits.x, Math.min(limits.x, panX));
+    panY = Math.max(-limits.y, Math.min(limits.y, panY));
+    modalImage.style.transform = 'translate3d(' + panX + 'px,' + panY + 'px,0) scale(' + zoom + ')';
+    imageArea.classList.toggle('is-zoomed', zoom > 1);
+  }
+
   function zoomTo(value) {
-    zoom = Math.max(1, Math.min(3, Math.round(value * 100) / 100));
+    const next = Math.max(1, Math.min(3, Math.round(value * 100) / 100));
+    if (next === 1 || next !== zoom) {
+      // Zooming starts from the centered artwork; panning begins only when the image overflows.
+      panX = 0;
+      panY = 0;
+      activePointerId = null;
+      if (imageArea) imageArea.classList.remove('is-dragging');
+    }
+    zoom = next;
     if (!modalImage) return;
-    modalImage.style.transform = 'scale(' + zoom + ')';
+    applyTransform();
     zoomOutButton.disabled = zoom <= 1;
     zoomInButton.disabled = zoom >= 3;
     zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+  }
+
+  function onPanStart(event) {
+    if (zoom <= 1 || activePointerId !== null || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    activePointerId = event.pointerId;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    imageArea.classList.add('is-dragging');
+    imageArea.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  }
+
+  function onPanMove(event) {
+    if (activePointerId !== event.pointerId) return;
+    panX += event.clientX - pointerX;
+    panY += event.clientY - pointerY;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    applyTransform();
+    event.preventDefault();
+  }
+
+  function onPanEnd(event) {
+    if (activePointerId !== event.pointerId) return;
+    activePointerId = null;
+    imageArea.classList.remove('is-dragging');
+    if (imageArea.hasPointerCapture(event.pointerId)) imageArea.releasePointerCapture(event.pointerId);
   }
 
   function showModalImage() {
@@ -176,12 +242,25 @@
     stage.className = 'art-lightbox-stage';
     prevButton = makeButton('‹', l.previous, 'art-lightbox-button art-lightbox-prev', () => navigate(-1));
     nextButton = makeButton('›', l.next, 'art-lightbox-button art-lightbox-next', () => navigate(1));
-    const imageArea = document.createElement('div');
+    imageArea = document.createElement('div');
     imageArea.className = 'art-lightbox-image-area';
+    imageArea.addEventListener('pointerdown', onPanStart);
+    imageArea.addEventListener('pointermove', onPanMove);
+    imageArea.addEventListener('pointerup', onPanEnd);
+    imageArea.addEventListener('pointercancel', onPanEnd);
+    imageArea.addEventListener('lostpointercapture', event => {
+      if (activePointerId === event.pointerId) onPanEnd(event);
+    });
     modalImage = document.createElement('img');
     modalImage.className = 'art-lightbox-image';
     modalImage.decoding = 'async';
-    modalImage.addEventListener('dblclick', () => zoomTo(zoom === 1 ? 2 : 1));
+    modalImage.draggable = false;
+    modalImage.addEventListener('load', applyTransform);
+    modalImage.addEventListener('dragstart', event => event.preventDefault());
+    modalImage.addEventListener('dblclick', event => {
+      event.preventDefault();
+      zoomTo(zoom === 1 ? 2 : 1);
+    });
     imageArea.append(modalImage);
     stage.append(prevButton, imageArea, nextButton);
 
@@ -210,7 +289,11 @@
     modal.addEventListener('close', () => {
       document.body.style.overflow = previousOverflow;
       modalImage.removeAttribute('src');
+      zoomTo(1);
       if (returnFocus && document.contains(returnFocus)) returnFocus.focus();
+    });
+    window.addEventListener('resize', () => {
+      if (modal.open) applyTransform();
     });
     modal.addEventListener('keydown', event => {
       if (event.key === 'ArrowLeft') { event.preventDefault(); navigate(-1); }

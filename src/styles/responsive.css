@@ -215,3 +215,8 @@ html { scroll-padding-top: 110px; }
   .category-page .category-switch a { font-size: .76rem; padding: 9px 12px; }
   .category-page .work-section.section-pad { padding-top: 15px; padding-bottom: 54px; }
 }
+
+/* Preserve a consistent thumbnail grid at every viewport width. */
+@media (max-width: 640px) {
+  .art-grid .artwork-from-r2 .real-artwork { padding: 10px; }
+}
