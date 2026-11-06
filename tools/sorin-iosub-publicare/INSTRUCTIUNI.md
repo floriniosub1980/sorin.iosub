@@ -1,77 +1,72 @@
-# Sorin Iosub — automatizare publicare lucrări
+# Sorin Iosub — publicare incrementală în Cloudflare R2
 
-Script pentru Windows 10/11, Python 3.10+, cu întrebări **pentru fiecare fotografie**.
+Python 3.10+ (inclusiv 3.14), Windows 10/11. Un singur catalog public: `https://media.soriniosub.com/data/artworks.json`.
 
-## Instalare (o singură dată)
+## Instalare / actualizare
 
-1. Instalează Python (cu opțiunea *Add Python to PATH*, dacă folosești `python`).
-2. Descarcă pachetul și dezarhivează-l într-un folder local, de exemplu `D:\SorinIosub\Publicare`.
-3. Dublu-click pe `INSTALEAZA_DEPENDINTE.bat`. Se instalează Pillow și boto3.
+1. Descarcă arhiva din `tools/sorin-iosub-publicare/Sorin_Iosub_Automatizare_Publicare_R2.zip` din GitHub.
+2. **Fă o copie de siguranță a folderului actual de publicare.** Dezarhivează pachetul peste fișierele de program existente, fără să ștergi directoarele `incoming`, `state`, `logs` și `output`. Nu șterge fotografiile originale.
+3. La prima instalare rulează `INSTALEAZA_DEPENDINTE.bat`; pentru rulările ulterioare este suficient `PORNESTE_PUBLICAREA.bat`.
+4. Dacă Python este deja instalat și funcționează cu `python --version`, fișierul BAT îl detectează automat.
 
-## Flux simplu
+## Cum folosești scriptul
 
-1. Copiază fotografiile `.jpg`, `.jpeg`, `.png`, `.tif`, `.tiff`, `.bmp` sau `.webp` în subfolderul `incoming` (fără subfoldere).
-2. Dublu-click pe `PORNESTE_PUBLICAREA.bat`.
-3. Scriptul citește **catalogul public curent** din `https://media.soriniosub.com/data/artworks.json` și îl validează; dacă nu îl poate accesa, se oprește pentru a evita pierderea lucrărilor existente.
-4. Pentru **fiecare imagine**, alege:
-    - `1` Painting (pictură) → `artworks/paintings/<id>/`
-    - `2` Graphic art (grafică/desen) → `artworks/graphics/<id>/`
-    - `3` Fresco (frescă) → `artworks/frescoes/<id>/`
-    - `0` pentru a sări peste fișier.
-5. Confirmă sau corectează ID-ul sugerat (ex. `si-0003` poate fi corectat la `si-0033`).
-6. Opțional, introdu titlul în română/engleză, anul, tehnica, dimensiunile, descrierea și textul `alt`. **Nu se inventează metadate.**
-7. Scriptul produce **full.webp** (latura maximă 2600 px) și **thumbnail.webp** (latura maximă 640 px), cu proporțiile păstrate, fără decupare, plus `data/artworks.json` validat.
-8. Primești o arhivă `pachet_pentru_R2.zip`. Poți alege să publici direct în R2 sau să încarci manual fișierele din arhivă după dezarhivare.
+1. Copiază fotografiile noi în folderul **`incoming`**, alături de cele vechi. Nu este nevoie să ștergi sau să muți imaginile anterioare.
+2. Rulează **`PORNESTE_PUBLICAREA.bat`**.
+3. Scriptul citește catalogul public R2 și compară fiecare fotografie cu **registrul local al imaginilor publicate** (amprentă SHA-256). Fotografiile deja publicate și ID-urile care există în catalog sunt **omise automat**, fără conversie și fără reupload.
+4. Numai pentru fotografiile noi, alege categoria: `1 = Painting`, `2 = Graphic art`, `3 = Frescoes`, `0 = omite`. Confirmă ID-ul sugerat din numele fișierului; poți să-l corectezi.
+5. Opțional completează titlul, anul, tehnica, dimensiunile, descrierea RO/EN și textul alternativ.
+6. Sunt generate câte două fișiere fără crop: `full.webp` (latura maximă 2600 px) și `thumbnail.webp` (640 px). Se actualizează și validează `data/artworks.json`.
+7. Confirmă publicarea R2 (imaginile se încarcă înaintea JSON-ului). După succes, fotografiile sunt înregistrate ca publicate.
 
-## Unde sunt rezultatele
+## Fișiere de istoric și jurnal
 
-`output/publicare_AAAALLZZ_OOMMSS/`
+Acestea **rămân local pe calculator** și **nu se încarcă în Cloudflare R2**:
 
-- `artworks/graphics/si-0007/full.webp`
-- `artworks/graphics/si-0007/thumbnail.webp`
-- `data/artworks.json` — catalogul complet, nu doar fotografiile nou introduse
-- `pachet_pentru_R2.zip` — imaginile noi + catalogul complet
+| Fișier | Ce conține |
+|---|---|
+| `state/publicate.json` | ID-ul lucrării, numele fotografiei, categoria, amprenta SHA-256, data UTC și sesiunea de publicare. Folosit pentru evitarea duplicatelor. |
+| `logs/publicari.csv` | Jurnal simplu, deschis în Excel: dată/ora UTC, fișier, ID, categorie, etapă, rezultat/eroare. |
+| `logs/publicari.jsonl` | Aceleași evenimente, în format JSON pentru diagnostic / analiză automată. |
+| `output/publicare_.../backup_catalog_r2_before_upload.json` | Copia catalogului live dinaintea fiecărei publicări efectuate. |
 
-**Important la încărcarea manuală:** încarcă **mai întâi imaginile** în bucket-ul `sorin-iosub-media` păstrând structura exactă și **abia apoi** înlocuiește `data/artworks.json`.
+**Nu șterge `state/publicate.json`**. Dacă îl pierzi, scriptul încă recunoaște majoritatea imaginilor existente după ID, dar nu mai poate recunoaște automat aceeași fotografie cu un nume diferit. Nu sunt salvate în registru cheile sau parola R2.
 
-## Încărcare automată Cloudflare R2 (opțional)
+## Comportament la rulări repetate
 
-Ai nevoie de token S3 R2 cu drepturi **Object Read & Write** pentru bucket-ul `sorin-iosub-media`, precum și de `Account ID` din Cloudflare. Scriptul solicită aceste valori, fără să le salveze. Poți configura și variabilele de mediu:
+- Dacă `incoming` este gol: scriptul se încheie normal, fără niciun upload.
+- Dacă toate imaginile sunt deja publicate: nu creează WebP-uri noi, nu modifică JSON-ul și nu contactează R2 pentru upload.
+- Dacă ai adăugat două fotografii: pregătește și publică **doar cele două fotografii**, păstrând întreg catalogul existent.
+- Dacă două fișiere au același conținut, chiar cu nume diferite, este procesat doar unul (SHA-256).
+- Imaginile vechi publicate **înainte de instalarea acestui upgrade** sunt recunoscute după ID-ul din numele fișierului și catalogul R2. De exemplu, `si-0004.jpg` este ignorat când există `si-0004` în catalog.
+- Excepție cunoscută: dacă ai încă `si-0003.jpg` dar în catalog lucrarea se numește `si-0033`, la prima rulare selectează categoria, corectează ID-ul în `si-0033`, apoi confirmă că este deja publicată. Scriptul reține amprenta fișierului și nu îl mai întreabă la rulările următoare.
+- Dacă ai generat doar un ZIP și ai ales **Nu** pentru încărcare R2, acele fotografii **nu** sunt marcate ca publicate. Este intenționat: pregătirea locală nu garantează publicarea.
 
-- `R2_ACCOUNT_ID`
-- `R2_ACCESS_KEY_ID`
-- `R2_SECRET_ACCESS_KEY`
+## Publicare întreruptă / erori
 
-La publicare, scriptul recitește catalogul R2 și verifică dacă acesta nu s-a modificat față de varianta de plecare. Salvează un **backup local** al catalogului R2, încarcă imaginile și **publică JSON-ul ultimul**. Dacă nu poate citi catalogul, se oprește înainte de orice încărcare.
+Dacă upload-ul unei imagini sau al JSON-ului eșuează, scriptul înregistrează eroarea în jurnal și **nu marchează lotul ca publicat**. La următoarea rulare îl poți relua. Dacă JSON-ul a fost încărcat cu succes, dar înregistrarea locală a eșuat (ex. disc plin), la următoarea rulare scriptul va recunoaște ID-urile existente în catalog și nu le va suprascrie.
 
-**Atenție:** dacă întrerupi upload-ul după ce imaginile au fost trimise, unele fișiere imagine pot exista deja în bucket; catalogul public rămâne neschimbat până la ultimul pas.
+JSON-ul live este verificat la început și imediat înaintea actualizării. Dacă a fost modificat între timp, publicarea este oprită înainte de upload.
 
-## Folosire avansată (PowerShell)
+## Actualizarea intenționată a unei lucrări existente
 
-```powershell
-py -3 -m pip install -r requirements.txt
-py -3 publica_lucrari.py --input "D:\Fotografii\Artist" --output "D:\Publicari"
+Implicit, scriptul **nu înlocuiește** imaginile deja publicate. Pentru corectarea explicită a unei lucrări poți rula în CMD:
+
+```cmd
+python publica_lucrari.py --replace-existing
 ```
 
-Dacă vrei să pornești de la un JSON local, descărcat din R2:
+În acest mod se cer confirmări pentru înlocuire. Este recomandat să păstrezi o copie a originalelor și să verifici categoria.
 
-```powershell
-py -3 publica_lucrari.py --input "D:\Fotografii\Artist" --catalogue "D:\SorinIosub\artworks.json"
+## Argumente și verificare
+
+```cmd
+python publica_lucrari.py --input "D:\\Fotografii\\SorinIosub" --output "D:\\Publicari"
+python publica_lucrari.py --validate-only "D:\\SorinIosub\\artworks.json"
 ```
 
-**Nu folosi catalogul demonstrativ inclus** ca înlocuitor automat pentru cel live; acesta reprezintă doar stadiul cu 6 lucrări și poate fi depășit.
+`--catalogue` permite un JSON local în locul celui public pentru pregătire offline; la publicarea efectivă în R2, catalogul local trebuie să coincidă cu cel live, altfel operația se oprește.
 
-Verificare JSON fără conversii:
+## Chei Cloudflare R2
 
-```powershell
-py -3 validate_artworks.py "D:\SorinIosub\artworks.json"
-```
-
-
-## Siguranță și limitări
-
-- Nu modifică fotografiile originale și nu le decupează.
-- Nu reîncarcă în R2 fără două confirmări explicite.
-- Dacă un ID există deja, cere confirmare înainte de înlocuirea imaginilor și păstrează metadatele.
-- Nu verifică automat existența publică a imaginilor din lucrări mai vechi în R2; verifică sintaxa, structura și adresele HTTPS.
-- Nu creează versiuni R2 la nivelul bucket-ului. Pentru restaurare păstrează backup-ul local al catalogului.
+Sunt folosite variabilele `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` sau introducerea interactivă, cu cheia secretă ascunsă. **Nu publica aceste chei în GitHub.** Bucket-ul implicit este `sorin-iosub-media`.

@@ -9,7 +9,9 @@ Publicarea directă în Cloudflare R2 este opțională și necesită confirmare.
 from __future__ import annotations
 
 import argparse
+import csv
 import getpass
+import hashlib
 import io
 import json
 import os
@@ -18,7 +20,7 @@ import sys
 import warnings
 import zipfile
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -37,6 +39,78 @@ CATEGORIES = {"1": ("paintings", "Painting / Pictură"),
 ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 Image.MAX_IMAGE_PIXELS = 120_000_000
 warnings.simplefilter("error", Image.DecompressionBombWarning)
+STATE_VERSION = 1
+AUDIT_COLUMNS = ("timestamp_utc", "run_id", "status", "source", "sha256", "artwork_id", "category", "message")
+
+
+def utc_now():
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def load_state(path):
+    """Local record of completed R2 publications; fail closed if damaged."""
+    if not path.exists():
+        return {"schemaVersion": STATE_VERSION, "published": {}}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"), object_pairs_hook=no_duplicate_keys)
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise RuntimeError(f"Registrul local este invalid: {path}. Nu îl suprascriu: {exc}") from exc
+    if not isinstance(data, dict) or data.get("schemaVersion") != STATE_VERSION or not isinstance(data.get("published"), dict):
+        raise RuntimeError(f"Structură necunoscută a registrului local: {path}")
+    for digest, record in data["published"].items():
+        if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or not isinstance(record, dict) or not isinstance(record.get("id"), str):
+            raise RuntimeError(f"Registrul local conține înregistrări invalide: {path}")
+    return data
+
+
+class AuditLog:
+    """Append-only publication journal; no account IDs or credentials are recorded."""
+    def __init__(self, folder, run_id):
+        self.folder = folder
+        self.run_id = run_id
+        folder.mkdir(parents=True, exist_ok=True)
+        self.csv_path = folder / "publicari.csv"
+        self.jsonl_path = folder / "publicari.jsonl"
+
+    def event(self, status, source="", digest="", identifier="", category="", message=""):
+        entry = {
+            "timestamp_utc": utc_now(), "run_id": self.run_id,
+            "status": status, "source": str(source), "sha256": digest,
+            "artwork_id": identifier, "category": category, "message": str(message)
+        }
+        # Do not allow spreadsheet formula execution from user-supplied filenames or notes.
+        row = {key: ("'" + str(value) if str(value).startswith(("=", "+", "-", "@")) else value)
+               for key, value in entry.items()}
+        try:
+            first_write = not self.csv_path.exists() or self.csv_path.stat().st_size == 0
+            with self.csv_path.open("a", encoding="utf-8-sig" if first_write else "utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=AUDIT_COLUMNS)
+                if first_write:
+                    writer.writeheader()
+                writer.writerow(row)
+            with self.jsonl_path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        except OSError as exc:
+            raise RuntimeError("Nu pot scrie jurnalul de publicare; operațiunea se oprește: " + str(exc)) from exc
+
+
+def mark_published(state_path, state, tasks, run_id):
+    """Commit hashes only *after* the remote JSON has been published successfully."""
+    for source, identifier, category, digest in tasks:
+        state["published"][digest] = {
+            "id": identifier, "category": category, "source": source.name,
+            "published_at_utc": utc_now(), "run_id": run_id,
+        }
+    atomic_write(state_path, (json.dumps(state, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+
 
 
 def say(message=""):
@@ -229,8 +303,7 @@ def ask_files(source_dir):
     folder = source_dir
     if folder is None:
         folder = ROOT / "incoming"
-        if not folder.exists() or not any(p.is_file() and p.suffix.lower() in EXTENSIONS
-                                          for p in folder.iterdir()):
+        if not folder.exists():
             folder = Path(prompt("Folderul cu fotografiile originale (cale completă)" ).strip('"'))
     folder = folder.expanduser().resolve()
     if not folder.is_dir():
@@ -238,8 +311,6 @@ def ask_files(source_dir):
     # Only files at the top level: no accidental re-import of staged outputs.
     files = sorted((p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in EXTENSIONS),
                    key=lambda p: p.name.casefold())
-    if not files:
-        raise RuntimeError(f"Nu există fotografii JPG/JPEG/PNG/TIFF/BMP/WebP în {folder}")
     return files
 
 
@@ -278,7 +349,7 @@ def r2_client():
                                       retries={"max_attempts": 4, "mode": "standard"}))
 
 
-def publish_to_r2(s3, base_catalogue, merged_catalogue, assets, json_bytes, stage):
+def publish_to_r2(s3, base_catalogue, merged_catalogue, assets, json_bytes, stage, audit=None):
     """Fail closed on remote changes and upload JSON last; no credentials written to disk."""
     from botocore.exceptions import ClientError
     try:
@@ -301,20 +372,40 @@ def publish_to_r2(s3, base_catalogue, merged_catalogue, assets, json_bytes, stag
     say(f"Backup local al catalogului R2: {backup}")
     say(f"Încarc {len(assets)} imagini WebP în R2 (catalogul va fi publicat ultimul)...")
     for key, path in assets:
-        s3.upload_file(str(path), BUCKET, key,
-                       ExtraArgs={"ContentType": "image/webp", "CacheControl": "public, max-age=3600"})
+        try:
+            s3.upload_file(str(path), BUCKET, key,
+                           ExtraArgs={"ContentType": "image/webp", "CacheControl": "public, max-age=3600"})
+        except Exception as exc:
+            if audit:
+                audit.event("upload_failed", source=key, message=f"{type(exc).__name__}: {exc}")
+            raise
         say(f"  OK: {key}")
+        if audit:
+            audit.event("webp_uploaded", source=key, message="Încărcat în Cloudflare R2")
     # Publish the manifest last so the site never points to images that have not been uploaded.
-    s3.put_object(Bucket=BUCKET, Key="data/artworks.json", Body=json_bytes,
-                  ContentType="application/json; charset=utf-8", CacheControl="no-cache")
+    try:
+        s3.put_object(Bucket=BUCKET, Key="data/artworks.json", Body=json_bytes,
+                      ContentType="application/json; charset=utf-8", CacheControl="no-cache")
+    except Exception as exc:
+        if audit:
+            audit.event("catalogue_upload_failed", source="data/artworks.json",
+                        message=f"{type(exc).__name__}: {exc}")
+        raise
     say("Catalogul a fost publicat în R2 după imagini.")
+    if audit:
+        audit.event("catalogue_uploaded", source="data/artworks.json", message="Catalogul R2 a fost actualizat cu succes")
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", type=Path, help="Folder cu fotografii; implicit incoming sau întrebare interactivă")
+    parser.add_argument("--input", type=Path, help="Folder cu fotografii; implicit incoming")
     parser.add_argument("--catalogue", type=Path, help="Catalog JSON local, dacă nu vrei citire publică din R2")
     parser.add_argument("--output", type=Path, default=ROOT / "output", help="Folder pentru pachetele generate")
+    parser.add_argument("--state", type=Path, default=ROOT / "state" / "publicate.json",
+                        help="Registrul local al fotografiilor deja publicate în R2")
+    parser.add_argument("--logs", type=Path, default=ROOT / "logs", help="Folderul jurnalelor CSV/JSONL")
+    parser.add_argument("--replace-existing", action="store_true",
+                        help="Permite actualizarea explicită a unei lucrări existente (cu confirmare)")
     parser.add_argument("--validate-only", type=Path, metavar="JSON", help="Validează un fișier JSON fără conversie")
     args = parser.parse_args(argv)
     if args.validate_only:
@@ -322,105 +413,188 @@ def main(argv=None):
         say(f"OK: JSON valid ({len(data['artworks'])} lucrări).")
         return 0
 
-    say("=" * 66)
-    say("  SORIN IOSUB — Asistent de publicare WebP / JSON / Cloudflare R2")
-    say("=" * 66)
-    images = ask_files(args.input)
-    say(f"Fotografii identificate: {len(images)}")
-    baseline = load_base_catalog(args.catalogue)
-    old_indexes = {w["id"]: i for i, w in enumerate(baseline["artworks"])}
-    merged = dict(baseline)
-    merged["artworks"] = [dict(w) for w in baseline["artworks"]]
-    tasks = []
-    chosen_ids = set()
-
-    for counter, source in enumerate(images, 1):
-        say(f"\n[{counter}/{len(images)}] Fotografie: {source.name}")
-        category = choose_category()
-        if category is None:
-            say("  Omisă.")
-            continue
-        proposed_id = clean_id(source.stem)
-        while True:
-            identifier = prompt("  ID lucrare (poți corecta numele propus)", proposed_id).lower()
-            if not ID_PATTERN.fullmatch(identifier):
-                say("  ID invalid: doar litere mici, cifre și cratimă (ex. si-0033).")
-                continue
-            if identifier in chosen_ids:
-                say("  Acest ID a fost deja folosit în lotul curent.")
-                continue
-            break
-        old = merged["artworks"][old_indexes[identifier]] if identifier in old_indexes else None
-        if old is not None:
-            say(f"  ID existent în catalog: {identifier} / {old.get('category', '?')}.")
-            if not yesno("  Confirmi înlocuirea imaginilor acestei lucrări și păstrarea metadatelor?"):
-                say("  Omisă.")
-                continue
-            if old.get("category") != category:
-                say("  ATENȚIE: schimbi categoria unei lucrări existente. Imaginile vechi din R2 nu vor fi șterse.")
-                if not yesno("  Confirmi schimbarea categoriei?"):
-                    continue
-        chosen_ids.add(identifier)
-        record = collect_record(source, category, identifier, old)
-        if old is None:
-            merged["artworks"].append(record)
-            old_indexes[identifier] = len(merged["artworks"]) - 1
-        else:
-            merged["artworks"][old_indexes[identifier]] = record
-        tasks.append((source, identifier, category))
-        say(f"  Pregătită: {identifier} → {category}")
-
-    if not tasks:
-        say("Nu ai selectat nicio lucrare. Niciun fișier nu a fost modificat.")
-        return 0
-    check_records(merged)
-
-    run_name = datetime.now().strftime("publicare_%Y%m%d_%H%M%S")
-    stage = args.output.expanduser().resolve() / run_name
-    if stage.exists():
-        raise RuntimeError("Folderul acestui lot există deja; reîncearcă după câteva secunde: " + str(stage))
-    stage.mkdir(parents=True)
-    assets = []
-    for source, identifier, category in tasks:
-        prefix = f"artworks/{category}/{identifier}"
-        full_key = f"{prefix}/full.webp"
-        thumb_key = f"{prefix}/thumbnail.webp"
-        full_path, thumb_path = stage / full_key, stage / thumb_key
-        original_size, full_size = convert_image(source, full_path, 2600, 88)
-        _, thumb_size = convert_image(source, thumb_path, 640, 82)
-        assets.extend(((full_key, full_path), (thumb_key, thumb_path)))
-        say(f"  {source.name}: {original_size} → full {full_size}, thumbnail {thumb_size} (fără crop)")
-
-    catalogue_bytes = (json.dumps(merged, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
-    result_json = stage / "data" / "artworks.json"
-    atomic_write(result_json, catalogue_bytes)
-    result_data = validate_file(result_json)
-    if normalize_catalog(result_data) != normalize_catalog(merged):
-        raise RuntimeError("Catalogul scris diferă de cel verificat: oprire.")
-    say(f"\nVALIDARE OK: {len(merged['artworks'])} lucrări în catalog.")
-    counts = Counter(w["category"] for w in merged["artworks"] if w.get("published") is not False)
-    say("Categorii publicate: " + ", ".join(f"{k}: {counts[k]}" for k in ("paintings", "graphics", "frescoes")))
-    zip_path = stage / "pachet_pentru_R2.zip"
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
-        for key, path in assets:
-            archive.write(path, arcname=key)
-        archive.write(result_json, arcname="data/artworks.json")
-    with zipfile.ZipFile(zip_path) as archive:
-        if archive.testzip() is not None:
-            raise RuntimeError("Arhiva ZIP nu a trecut testul de integritate.")
-    say(f"\nJSON: {result_json}")
-    say(f"ZIP:  {zip_path}")
-    say("NOTĂ: un ZIP pentru R2 se dezarhivează înaintea încărcării manuale.")
-
-    if yesno("Dorești publicare automată în Cloudflare R2 acum?"):
-        s3 = r2_client()
-        if not yesno(f"Confirmi încărcarea a {len(assets)} imagini și înlocuirea data/artworks.json în {BUCKET}?"):
-            say("Publicarea R2 a fost anulată. Pachetul local rămâne disponibil.")
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
+    audit = AuditLog(args.logs.expanduser().resolve(), run_id)
+    audit.event("started", message="Sesiune de publicare inițiată")
+    try:
+        say("=" * 66)
+        say("  SORIN IOSUB — Publicare incrementală WebP / JSON / Cloudflare R2")
+        say("=" * 66)
+        images = ask_files(args.input)
+        say(f"Fotografii în incoming: {len(images)}")
+        if not images:
+            say("Nu există fotografii în incoming. Nicio transformare, nicio încărcare.")
+            audit.event("no_new_images", message="Folderul incoming este gol")
             return 0
-        publish_to_r2(s3, baseline, merged, assets, catalogue_bytes, stage)
-    else:
-        say("Fără încărcare în R2. Poți folosi ZIP-ul sau publica ulterior manual.")
-    return 0
+        state_path = args.state.expanduser().resolve()
+        state = load_state(state_path)
+        baseline = load_base_catalog(args.catalogue)
+        old_indexes = {w["id"]: i for i, w in enumerate(baseline["artworks"])}
+        merged = dict(baseline)
+        merged["artworks"] = [dict(w) for w in baseline["artworks"]]
+        tasks = []
+        chosen_ids = set()
+        seen_digests = set()
+        skipped = 0
+
+        for counter, source in enumerate(images, 1):
+            say(f"\n[{counter}/{len(images)}] Fotografie: {source.name}")
+            digest = sha256_file(source)
+            if digest in seen_digests:
+                skipped += 1
+                say("  OMISĂ: duplicat al unei alte fotografii din lotul curent (SHA-256 identic).")
+                audit.event("skipped_duplicate_batch", source.name, digest, message="Conținut duplicat în incoming")
+                continue
+            seen_digests.add(digest)
+            tracked = state["published"].get(digest)
+            if (tracked and tracked["id"] in old_indexes
+                    and baseline["artworks"][old_indexes[tracked["id"]]].get("published") is not False
+                    and not args.replace_existing):
+                skipped += 1
+                say(f"  DEJA PUBLICATĂ: {tracked['id']} (SHA-256 confirmat). Omit conversia și upload-ul.")
+                audit.event("skipped_published_hash", source.name, digest, tracked["id"], tracked.get("category", ""),
+                            "Fotografie înregistrată ca publicată în R2")
+                continue
+            proposed_id = clean_id(source.stem)
+            if proposed_id in old_indexes and not args.replace_existing:
+                skipped += 1
+                say(f"  DEJA ÎN CATALOG: {proposed_id}. Nu reprocesăm și nu suprascriem imaginile.")
+                audit.event("skipped_existing_id", source.name, digest, proposed_id,
+                            baseline["artworks"][old_indexes[proposed_id]]["category"],
+                            "ID existent în catalogul R2; folosește --replace-existing pentru actualizare intenționată")
+                continue
+            category = choose_category()
+            if category is None:
+                skipped += 1
+                audit.event("skipped_by_user", source.name, digest, message="Utilizatorul a omis fotografia")
+                continue
+            while True:
+                identifier = prompt("  ID lucrare (poți corecta numele propus)", proposed_id).lower()
+                if not ID_PATTERN.fullmatch(identifier):
+                    say("  ID invalid: doar litere mici, cifre și cratimă (ex. si-0033).")
+                    continue
+                if identifier in chosen_ids:
+                    say("  Acest ID a fost deja folosit în lotul curent.")
+                    continue
+                break
+            old = merged["artworks"][old_indexes[identifier]] if identifier in old_indexes else None
+            if old is not None:
+                say(f"  ID existent în catalog: {identifier} / {old.get('category', '?')}.")
+                if not args.replace_existing:
+                    skipped += 1
+                    say("  OMISĂ: lucrarea există deja; republicarea este dezactivată implicit.")
+                    # Handles old files whose original name differs from the published ID
+                    # (for example si-0003.jpg -> si-0033). Ask once, then remember their hash.
+                    if yesno("  Confirmi că fotografia este aceeași lucrare deja publicată și vrei să o ignorăm în viitor?"):
+                        state["published"][digest] = {
+                            "id": identifier, "category": old.get("category", ""),
+                            "source": source.name, "published_at_utc": utc_now(),
+                            "run_id": run_id, "source_type": "confirmed_existing"
+                        }
+                        atomic_write(state_path, (json.dumps(state, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+                        audit.event("confirmed_existing", source.name, digest, identifier,
+                                    old.get("category", ""), "Utilizatorul a confirmat corespondența cu o lucrare existentă")
+                    else:
+                        audit.event("skipped_existing_id", source.name, digest, identifier,
+                                    old.get("category", ""), "Protecție împotriva suprascrierii")
+                    continue
+                if not yesno("  Confirmi înlocuirea imaginilor acestei lucrări și păstrarea metadatelor?"):
+                    skipped += 1
+                    audit.event("skipped_by_user", source.name, digest, identifier, category, "Înlocuire anulată")
+                    continue
+                if old.get("category") != category:
+                    say("  ATENȚIE: schimbi categoria unei lucrări existente. Imaginile vechi din R2 nu vor fi șterse.")
+                    if not yesno("  Confirmi schimbarea categoriei?"):
+                        skipped += 1
+                        audit.event("skipped_by_user", source.name, digest, identifier, category,
+                                    "Schimbare categorie anulată")
+                        continue
+            chosen_ids.add(identifier)
+            record = collect_record(source, category, identifier, old)
+            if old is None:
+                merged["artworks"].append(record)
+                old_indexes[identifier] = len(merged["artworks"]) - 1
+            else:
+                merged["artworks"][old_indexes[identifier]] = record
+            tasks.append((source, identifier, category, digest))
+            audit.event("selected", source.name, digest, identifier, category, "Selectată pentru conversie")
+            say(f"  Pregătită: {identifier} → {category}")
+
+        if not tasks:
+            say(f"\nNu există fotografii noi de procesat. Omise: {skipped}.")
+            say(f"Jurnal: {audit.csv_path}")
+            audit.event("no_new_images", message=f"{skipped} fotografii omise, niciun upload")
+            return 0
+        check_records(merged)
+
+        run_name = "publicare_" + run_id
+        stage = args.output.expanduser().resolve() / run_name
+        if stage.exists():
+            raise RuntimeError("Folderul acestui lot există deja: " + str(stage))
+        stage.mkdir(parents=True)
+        assets = []
+        for source, identifier, category, digest in tasks:
+            prefix = f"artworks/{category}/{identifier}"
+            full_key = f"{prefix}/full.webp"
+            thumb_key = f"{prefix}/thumbnail.webp"
+            full_path, thumb_path = stage / full_key, stage / thumb_key
+            try:
+                original_size, full_size = convert_image(source, full_path, 2600, 88)
+                _, thumb_size = convert_image(source, thumb_path, 640, 82)
+            except Exception as exc:
+                audit.event("conversion_failed", source.name, digest, identifier, category,
+                            f"{type(exc).__name__}: {exc}")
+                raise RuntimeError(f"Conversie nereușită pentru {source.name}: {exc}") from exc
+            assets.extend(((full_key, full_path), (thumb_key, thumb_path)))
+            audit.event("converted", source.name, digest, identifier, category,
+                        f"Original {original_size}; full {full_size}; thumbnail {thumb_size}")
+            say(f"  {source.name}: {original_size} → full {full_size}, thumbnail {thumb_size} (fără crop)")
+
+        catalogue_bytes = (json.dumps(merged, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+        result_json = stage / "data" / "artworks.json"
+        atomic_write(result_json, catalogue_bytes)
+        result_data = validate_file(result_json)
+        if normalize_catalog(result_data) != normalize_catalog(merged):
+            raise RuntimeError("Catalogul scris diferă de cel verificat: oprire.")
+        say(f"\nVALIDARE OK: {len(merged['artworks'])} lucrări în catalog.")
+        counts = Counter(w["category"] for w in merged["artworks"] if w.get("published") is not False)
+        say("Categorii publicate: " + ", ".join(f"{k}: {counts[k]}" for k in ("paintings", "graphics", "frescoes")))
+        zip_path = stage / "pachet_pentru_R2.zip"
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
+            for key, path in assets:
+                archive.write(path, arcname=key)
+            archive.write(result_json, arcname="data/artworks.json")
+        with zipfile.ZipFile(zip_path) as archive:
+            if archive.testzip() is not None:
+                raise RuntimeError("Arhiva ZIP nu a trecut testul de integritate.")
+        say(f"\nJSON: {result_json}")
+        say(f"ZIP:  {zip_path}")
+        say(f"Noi: {len(tasks)} | Omise: {skipped} | Jurnal: {audit.csv_path}")
+        audit.event("package_prepared", message=f"{len(tasks)} fotografii noi, {skipped} omise; {zip_path}")
+        say("NOTĂ: la încărcarea manuală, dezarhivează pachetul înainte de upload.")
+
+        if yesno("Dorești publicare automată în Cloudflare R2 acum?"):
+            s3 = r2_client()
+            if not yesno(f"Confirmi încărcarea a {len(assets)} imagini și înlocuirea data/artworks.json în {BUCKET}?"):
+                say("Publicarea R2 a fost anulată. Pachetul local rămâne disponibil.")
+                audit.event("upload_cancelled", message="Publicarea R2 a fost anulată de utilizator")
+                return 0
+            publish_to_r2(s3, baseline, merged, assets, catalogue_bytes, stage, audit)
+            # Only a successful remote JSON upload marks the originals as fully published.
+            mark_published(state_path, state, tasks, run_id)
+            for source, identifier, category, digest in tasks:
+                audit.event("published", source.name, digest, identifier, category, "Imagine și catalog încărcate în R2")
+            say(f"\nPUBLICARE REUȘITĂ: {len(tasks)} lucrări noi. Registru: {state_path}")
+        else:
+            say("Fără încărcare în R2. Nu marchez imaginile ca publicate; poți relua ulterior.")
+            audit.event("upload_not_requested", message="Pachet generat fără publicare în R2")
+        return 0
+    except (Exception, KeyboardInterrupt, EOFError) as exc:
+        try:
+            audit.event("failed", message=f"{type(exc).__name__}: {exc}")
+        except Exception:
+            pass
+        raise
 
 
 if __name__ == "__main__":
