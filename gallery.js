@@ -112,6 +112,7 @@
   let imageArea;
   let panX = 0;
   let panY = 0;
+  let transformFrame = 0;
   let activePointerId = null;
   let pointerX = 0;
   let pointerY = 0;
@@ -154,13 +155,23 @@
     };
   }
 
+  // Touch events may arrive faster than the display refresh rate.
+  // Paint only the newest gesture state once per frame, avoiding redundant
+  // layout reads / GPU transform updates on iOS Safari and Android Chrome.
   function applyTransform() {
-    if (!modalImage || !imageArea) return;
-    const limits = panLimits();
-    panX = Math.max(-limits.x, Math.min(limits.x, panX));
-    panY = Math.max(-limits.y, Math.min(limits.y, panY));
-    modalImage.style.transform = 'translate3d(' + panX + 'px,' + panY + 'px,0) scale(' + zoom + ')';
-    imageArea.classList.toggle('is-zoomed', zoom > 1);
+    if (!modalImage || !imageArea || transformFrame) return;
+    transformFrame = window.requestAnimationFrame(() => {
+      transformFrame = 0;
+      if (!modalImage || !imageArea) return;
+      const limits = panLimits();
+      panX = Math.max(-limits.x, Math.min(limits.x, panX));
+      panY = Math.max(-limits.y, Math.min(limits.y, panY));
+      modalImage.style.transform = 'translate3d(' + panX + 'px,' + panY + 'px,0) scale(' + zoom + ')';
+      imageArea.classList.toggle('is-zoomed', zoom > 1);
+      zoomOutButton.disabled = zoom <= 1;
+      zoomInButton.disabled = zoom >= 3;
+      zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+    });
   }
 
   function zoomTo(value) {
@@ -175,9 +186,7 @@
     zoom = next;
     if (!modalImage) return;
     applyTransform();
-    zoomOutButton.disabled = zoom <= 1;
-    zoomInButton.disabled = zoom >= 3;
-    zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+
   }
 
   function focusPoint(x, y) {
@@ -192,9 +201,7 @@
     panY = next === 1 ? 0 : focus.y - (focus.y - panY) * ratio;
     zoom = next;
     applyTransform();
-    zoomOutButton.disabled = zoom <= 1;
-    zoomInButton.disabled = zoom >= 3;
-    zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+
   }
 
   function touchGeometry() {
@@ -248,9 +255,7 @@
           panY = next === 1 ? 0 : current.y - (initial.y - pinchBase.panY) * ratio;
           zoom = next;
           applyTransform();
-          zoomOutButton.disabled = zoom <= 1;
-          zoomInButton.disabled = zoom >= 3;
-          zoomResetButton.textContent = Math.round(zoom * 100) + '%';
+
         }
       } else if (zoom > 1) {
         panX += event.clientX - previous.x;
@@ -349,6 +354,10 @@
     imageArea.addEventListener('pointermove', onPanMove);
     imageArea.addEventListener('pointerup', onPanEnd);
     imageArea.addEventListener('pointercancel', onPanEnd);
+    // Prevent native iOS Safari page magnification from fighting the artwork pinch.
+    for (const type of ['gesturestart', 'gesturechange']) {
+      imageArea.addEventListener(type, event => event.preventDefault(), { passive: false });
+    }
     imageArea.addEventListener('wheel', onWheelZoom, { passive: false });
     imageArea.addEventListener('lostpointercapture', event => {
       if (activePointerId === event.pointerId) onPanEnd(event);
