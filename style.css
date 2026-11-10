@@ -315,3 +315,23 @@
 .seo-artwork-actions a{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:900px){.seo-artwork-content{padding-top:38px;padding-bottom:65px}.seo-artwork-layout{grid-template-columns:1fr}.seo-artwork-text h1{font-size:clamp(2.6rem,7vw,4rem)}}
 @media(max-width:640px){.seo-artwork-content{padding-top:25px;padding-bottom:45px}.seo-artwork-figure a{min-height:190px;padding:8px}.seo-artwork-figure img{max-height:65vh}.seo-artwork-text h1{font-size:clamp(2.25rem,10vw,3.5rem)}}
+
+/* iOS/Android touch viewer: a single 2D canvas prevents WebKit image
+   compositing ghost frames during pinch and button-driven zoom. */
+.art-lightbox-image-area .art-lightbox-canvas {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.art-lightbox-image-area.is-canvas .art-lightbox-canvas { display: block; }
+.art-lightbox-image-area.is-canvas .art-lightbox-image,
+.art-lightbox-image-area.is-image-loading .art-lightbox-image {
+  visibility: hidden;
+}
+.art-lightbox-image-area {
+  overscroll-behavior: contain;
+  -webkit-tap-highlight-color: transparent;
+}

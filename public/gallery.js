@@ -110,6 +110,13 @@
   let modal;
   let modalImage;
   let imageArea;
+  let mobileCanvas;
+  let mobileCanvasContext;
+  let canvasAvailable = false;
+  // The canvas renderer avoids Safari/WebKit image-layer ghosting during pinch
+  // zoom by repainting exactly one 2D surface, rather than scaling an <img>.
+  const useTouchCanvas = window.matchMedia('(pointer: coarse)').matches ||
+    (navigator.maxTouchPoints || 0) > 0;
   let panX = 0;
   let panY = 0;
   let transformFrame = 0;
@@ -155,9 +162,48 @@
     };
   }
 
-  // Touch events may arrive faster than the display refresh rate.
-  // Paint only the newest gesture state once per frame, avoiding redundant
-  // layout reads / GPU transform updates on iOS Safari and Android Chrome.
+  // iOS Safari can display stale composited <img> layers when a full-size image
+  // is repeatedly transformed. Mobile zoom instead paints a single canvas:
+  // no animated CSS transform and no second image layer.
+  function drawTouchCanvas() {
+    if (!canvasAvailable || !mobileCanvasContext || !modalImage.complete ||
+        !modalImage.naturalWidth || !modalImage.naturalHeight) return false;
+    const width = imageArea.clientWidth;
+    const height = imageArea.clientHeight;
+    if (!width || !height) return false;
+    // Limit backing-store resolution on high-DPR phones to avoid large GPU
+    // allocations; this canvas is only the viewer, never the source artwork.
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const pixelWidth = Math.max(1, Math.round(width * ratio));
+    const pixelHeight = Math.max(1, Math.round(height * ratio));
+    try {
+      if (mobileCanvas.width !== pixelWidth || mobileCanvas.height !== pixelHeight) {
+        mobileCanvas.width = pixelWidth;
+        mobileCanvas.height = pixelHeight;
+      }
+      const ctx = mobileCanvasContext;
+      ctx.setTransform(pixelWidth / width, 0, 0, pixelHeight / height, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.fillStyle = '#1f2221';
+      ctx.fillRect(0, 0, width, height);
+      const fit = Math.min(width / modalImage.naturalWidth, height / modalImage.naturalHeight);
+      const drawnWidth = modalImage.naturalWidth * fit * zoom;
+      const drawnHeight = modalImage.naturalHeight * fit * zoom;
+      ctx.drawImage(modalImage,
+        (width - drawnWidth) / 2 + panX,
+        (height - drawnHeight) / 2 + panY,
+        drawnWidth, drawnHeight);
+      return true;
+    } catch (error) {
+      console.warn('Canvas artwork rendering unavailable; using image fallback.', error);
+      canvasAvailable = false;
+      return false;
+    }
+  }
+
+  // Coalesce pointer events into a single frame. The canvas becomes visible
+  // only after the current image has actually been drawn successfully.
   function applyTransform() {
     if (!modalImage || !imageArea || transformFrame) return;
     transformFrame = window.requestAnimationFrame(() => {
@@ -166,8 +212,22 @@
       const limits = panLimits();
       panX = Math.max(-limits.x, Math.min(limits.x, panX));
       panY = Math.max(-limits.y, Math.min(limits.y, panY));
-      modalImage.style.transform = 'translate3d(' + panX + 'px,' + panY + 'px,0) scale(' + zoom + ')';
       imageArea.classList.toggle('is-zoomed', zoom > 1);
+      if (canvasAvailable) {
+        if (drawTouchCanvas()) {
+          imageArea.classList.add('is-canvas');
+          imageArea.classList.remove('is-image-loading');
+        } else if (modalImage.complete && modalImage.naturalWidth) {
+          // Failed canvas draw (not loading): restore the standard image.
+          imageArea.classList.remove('is-canvas', 'is-image-loading');
+          modalImage.style.transform =
+            'translate3d(' + panX + 'px,' + panY + 'px,0) scale(' + zoom + ')';
+        }
+      } else {
+        modalImage.style.transform =
+          'translate3d(' + panX + 'px,' + panY + 'px,0) scale(' + zoom + ')';
+        imageArea.classList.remove('is-image-loading');
+      }
       zoomOutButton.disabled = zoom <= 1;
       zoomInButton.disabled = zoom >= 3;
       zoomResetButton.textContent = Math.round(zoom * 100) + '%';
@@ -314,8 +374,14 @@
     const work = visibleWorks[currentIndex];
     if (!work || !modal) return;
     clearGestures();
-    modalImage.src = work._full;
+    imageArea.classList.remove('is-canvas');
+    imageArea.classList.add('is-image-loading');
+    modalImage.style.transform = 'none';
     modalImage.alt = pick(work.alt) || pick(work.title) || '';
+    if (mobileCanvas) {
+      mobileCanvas.setAttribute('aria-label', modalImage.alt);
+    }
+    modalImage.src = work._full;
     modalTitle.textContent = pick(work.title) || work.id || (lang === 'ro' ? 'Fără titlu' : 'Untitled');
     modalDetails.textContent = detailsOf(work);
     modalCounter.textContent = (currentIndex + 1) + ' ' + l.of + ' ' + visibleWorks.length;
@@ -367,12 +433,32 @@
     modalImage.decoding = 'async';
     modalImage.draggable = false;
     modalImage.addEventListener('load', applyTransform);
+    modalImage.addEventListener('error', () => {
+      imageArea.classList.remove('is-image-loading', 'is-canvas');
+    });
     modalImage.addEventListener('dragstart', event => event.preventDefault());
     modalImage.addEventListener('dblclick', event => {
       event.preventDefault();
       zoomTo(zoom === 1 ? 2 : 1);
     });
     imageArea.append(modalImage);
+    if (useTouchCanvas) {
+      mobileCanvas = document.createElement('canvas');
+      mobileCanvas.className = 'art-lightbox-canvas';
+      mobileCanvas.setAttribute('role', 'img');
+      mobileCanvas.setAttribute('aria-label', '');
+      mobileCanvas.setAttribute('aria-hidden', 'true');
+      mobileCanvas.setAttribute('width', '1');
+      mobileCanvas.setAttribute('height', '1');
+      try {
+        mobileCanvasContext = mobileCanvas.getContext('2d',
+          { alpha: false, desynchronized: true });
+        canvasAvailable = Boolean(mobileCanvasContext);
+      } catch (error) {
+        canvasAvailable = false;
+      }
+      imageArea.append(mobileCanvas);
+    }
     stage.append(prevButton, imageArea, nextButton);
 
     const bottom = document.createElement('div');
@@ -399,6 +485,11 @@
     });
     modal.addEventListener('close', () => {
       clearGestures();
+      if (transformFrame) {
+        window.cancelAnimationFrame(transformFrame);
+        transformFrame = 0;
+      }
+      imageArea.classList.remove('is-canvas', 'is-image-loading');
       document.body.style.overflow = previousOverflow;
       modalImage.removeAttribute('src');
       zoomTo(1);
@@ -425,6 +516,7 @@
       previousOverflow = document.body.style.overflow;
       modal.showModal();
       document.body.style.overflow = 'hidden';
+      applyTransform();
     } else {
       window.open(visibleWorks[index]._full, '_blank', 'noopener,noreferrer');
     }
