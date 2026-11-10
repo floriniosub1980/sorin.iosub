@@ -17,13 +17,33 @@ const description = kind === 'painting'
   : (lang === 'ro' ? 'Fresce și proiecte de artă monumentală realizate de Sorin Iosub.' : 'Frescoes and monumental art projects by Sorin Iosub.');
 const scope = kind === 'painting' ? 'paintings,graphics' : 'frescoes';
 const ids = ['artworks', 'practice', 'exhibitions', 'about', 'contact'];
+
+const seoTitle = kind === 'painting' ? (lang === 'ro' ? 'Pictură și desen — Sorin Iosub' : 'Paintings & Drawings — Sorin Iosub') : (lang === 'ro' ? 'Fresce și artă monumentală — Sorin Iosub' : 'Frescoes & Monumental Art — Sorin Iosub');
+const seoDescription = description;
+const seoCanonical = 'https://soriniosub.com' + routes[lang as 'en' | 'ro'][kind as 'painting' | 'fresco'];
+
+const socialGraph = {'@context':'https://schema.org','@graph':[
+ {'@type':'Person','@id':'https://soriniosub.com/#artist',name:'Sorin Iosub',url:'https://soriniosub.com/en/',image:'https://media.soriniosub.com/artist/sorin_portret.webp'},
+ {'@type':'CollectionPage',url:seoCanonical,name:seoTitle,description:seoDescription,inLanguage:lang}
+]};
 ---
 <!doctype html>
 <html lang={lang}>
 <head>
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>{title} — Sorin Iosub</title>
-<meta name="description" content={description} /><meta name="theme-color" content="#f6f4ef" />
+<title>{seoTitle}</title>
+<meta name="description" content={seoDescription} /><meta name="theme-color" content="#f6f4ef" />
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sorin Iosub" />
+  <meta property="og:locale" content={lang === 'ro' ? 'ro_RO' : 'en_US'} />
+  <meta property="og:title" content={seoTitle} />
+  <meta property="og:description" content={seoDescription} />
+  <meta property="og:url" content={seoCanonical} />
+  <meta property="og:image" content="https://media.soriniosub.com/artist/sorin_portret.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://media.soriniosub.com" />
+  <script type="application/ld+json" set:html={JSON.stringify(socialGraph)} />
 <link rel="canonical" href={'https://soriniosub.com' + routes[lang as 'en'|'ro'][kind as 'painting'|'fresco']} />
 <link rel="alternate" hreflang="en" href={'https://soriniosub.com' + routes.en[kind as 'painting'|'fresco']} />
 <link rel="alternate" hreflang="ro" href={'https://soriniosub.com' + routes.ro[kind as 'painting'|'fresco']} />

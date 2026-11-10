@@ -6,15 +6,35 @@ const { lang = 'en' } = Astro.props;
 const t = content[lang as 'en' | 'ro'];
 const target = lang === 'en' ? '/ro/' : '/en/';
 const ids = ['artworks','practice','exhibitions','about','contact'];
+
+const seoTitle = lang === 'ro' ? 'Sorin Iosub — Pictor și artist vizual român | Pictură și frescă' : 'Sorin Iosub — Romanian Contemporary Artist | Paintings & Frescoes';
+const seoDescription = lang === 'ro' ? 'Descoperă picturile, grafica, frescele și expozițiile artistului vizual român Sorin Iosub.' : 'Explore paintings, graphic art, frescoes and exhibitions by Romanian visual artist Sorin Iosub.';
+const seoCanonical = 'https://soriniosub.com/' + lang + '/';
+
+const socialGraph = {'@context':'https://schema.org','@graph':[
+ {'@type':'Person','@id':'https://soriniosub.com/#artist',name:'Sorin Iosub',url:'https://soriniosub.com/en/',image:'https://media.soriniosub.com/artist/sorin_portret.webp'},
+ {'@type':'WebPage',url:seoCanonical,name:seoTitle,description:seoDescription,inLanguage:lang}
+]};
 ---
 <!doctype html>
 <html lang={lang}>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content={t.heroCopy} />
+  <meta name="description" content={seoDescription} />
   <meta name="theme-color" content="#f6f4ef" />
-  <title>Sorin Iosub — {t.eyebrow}</title>
+  <meta name="robots" content="index,follow,max-image-preview:large" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sorin Iosub" />
+  <meta property="og:locale" content={lang === 'ro' ? 'ro_RO' : 'en_US'} />
+  <meta property="og:title" content={seoTitle} />
+  <meta property="og:description" content={seoDescription} />
+  <meta property="og:url" content={seoCanonical} />
+  <meta property="og:image" content="https://media.soriniosub.com/artist/sorin_portret.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://media.soriniosub.com" />
+  <script type="application/ld+json" set:html={JSON.stringify(socialGraph)} />
+  <title>{seoTitle}</title>
   <link rel="canonical" href={'https://soriniosub.com/' + lang + '/'} />
   <link rel="alternate" hreflang="en" href="https://soriniosub.com/en/" />
   <link rel="alternate" hreflang="ro" href="https://soriniosub.com/ro/" />

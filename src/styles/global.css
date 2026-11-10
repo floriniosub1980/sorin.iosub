@@ -290,3 +290,23 @@
   outline: 3px solid #9b533e;
   outline-offset: 3px;
 }
+
+/* Artwork detail pages and links for search indexing. */
+.artwork-details-link{display:inline-block;margin-top:14px;padding-bottom:5px;border-bottom:1px solid #9b533e;font-size:.78rem;color:#55554f}
+.artwork-details-link:hover{color:#9b533e}
+.artwork-details-link:focus-visible,.seo-artwork-actions a:focus-visible{outline:3px solid #9b533e;outline-offset:3px}
+.seo-artwork-content{padding-top:64px;padding-bottom:94px}
+.seo-breadcrumb{font-size:.78rem;color:#686860;margin-bottom:36px;line-height:1.8;overflow-wrap:anywhere}
+.seo-breadcrumb a{text-decoration:underline;text-underline-offset:3px}
+.seo-artwork-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);align-items:start;gap:clamp(30px,6vw,90px)}
+.seo-artwork-figure{background:#ebe7df;min-height:300px;border:1px solid #e2dcd2}
+.seo-artwork-figure a{display:grid;place-items:center;padding:14px;min-height:300px}
+.seo-artwork-figure img{display:block;width:100%;height:auto;max-height:min(76vh,900px);object-fit:contain}
+.seo-artwork-text h1{font-size:clamp(2.5rem,4.5vw,5.7rem);overflow-wrap:anywhere}
+.seo-artwork-text .eyebrow{color:#7a6050}
+.seo-artwork-meta{font-size:.9rem;color:#73736a;margin-top:26px}
+.seo-artwork-description{font-size:1rem;max-width:560px;color:#4a4c46;margin-top:24px}
+.seo-artwork-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:30px;font-size:.8rem}
+.seo-artwork-actions a{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:900px){.seo-artwork-content{padding-top:38px;padding-bottom:65px}.seo-artwork-layout{grid-template-columns:1fr}.seo-artwork-text h1{font-size:clamp(2.6rem,7vw,4rem)}}
+@media(max-width:640px){.seo-artwork-content{padding-top:25px;padding-bottom:45px}.seo-artwork-figure a{min-height:190px;padding:8px}.seo-artwork-figure img{max-height:65vh}.seo-artwork-text h1{font-size:clamp(2.25rem,10vw,3.5rem)}}

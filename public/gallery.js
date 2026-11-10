@@ -25,7 +25,7 @@
       frescoes: 'Fresco', graphics: 'Graphic art', viewer: 'Artwork viewer',
       close: 'Close', previous: 'Previous artwork', next: 'Next artwork',
       zoomIn: 'Zoom in', zoomOut: 'Zoom out', reset: 'Reset zoom',
-      enlarge: 'View artwork in the gallery', of: 'of'
+      enlarge: 'View artwork in the gallery', detailLink: 'Artwork details', of: 'of'
     },
     ro: {
       loading: 'Se încarcă lucrările…', unavailable: 'Galeria este temporar indisponibilă.',
@@ -37,7 +37,7 @@
       viewer: 'Vizualizare lucrare', close: 'Închide',
       previous: 'Lucrarea precedentă', next: 'Lucrarea următoare',
       zoomIn: 'Mărește', zoomOut: 'Micșorează', reset: 'Resetează zoomul',
-      enlarge: 'Vizualizează lucrarea în galerie', of: 'din'
+      enlarge: 'Vizualizează lucrarea în galerie', detailLink: 'Detalii despre lucrare', of: 'din'
     }
   }[lang];
 
@@ -448,6 +448,13 @@
     content.append(textNode('p', detailsOf(work), 'artwork-meta'));
     const description = pick(work.description);
     if (description) content.append(textNode('p', description, 'artwork-description'));
+    if (typeof work.id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(work.id)) {
+      const detailLink = document.createElement('a');
+      detailLink.className = 'artwork-details-link';
+      detailLink.href = '/' + lang + '/' + (lang === 'en' ? 'artworks' : 'lucrari') + '/' + work.id + '/';
+      detailLink.textContent = l.detailLink;
+      content.append(detailLink);
+    }
     info.append(content);
     card.append(link, info);
     return card;
