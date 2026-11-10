@@ -1,0 +1,42 @@
+name: Sync artwork SEO from R2
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "13,43 * * * *"
+  push:
+    paths:
+      - "tools/seo/**"
+      - ".github/workflows/seo-sync.yml"
+permissions:
+  contents: write
+concurrency:
+  group: artwork-seo-sync
+  cancel-in-progress: false
+jobs:
+  seo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Render static bilingual artwork pages and sitemap from published R2 JSON
+        run: node tools/seo/generate.mjs
+      - name: Check sitemap
+        run: |
+          test -s sitemap.xml
+          grep -q '<urlset' sitemap.xml
+      - name: Commit only changed pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- en/artworks/ ro/lucrari/ sitemap.xml robots.txt public/sitemap.xml public/robots.txt
+          if git diff --cached --quiet; then
+            echo "No changes to SEO output"
+          else
+            git commit -m "Sync artwork SEO pages and image sitemap from R2"
+            git push origin HEAD:main
+          fi

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://soriniosub.com/sitemap.xml

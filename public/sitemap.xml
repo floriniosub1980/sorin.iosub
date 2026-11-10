@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<url><loc>https://soriniosub.com/en/</loc></url>
+<url><loc>https://soriniosub.com/ro/</loc></url>
+<url><loc>https://soriniosub.com/en/painting-drawing/</loc></url>
+<url><loc>https://soriniosub.com/ro/pictura-desen/</loc></url>
+<url><loc>https://soriniosub.com/en/frescoes-monumental/</loc></url>
+<url><loc>https://soriniosub.com/ro/fresce-monumentale/</loc></url>
+<url><loc>https://soriniosub.com/en/artworks/lucrare-001/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/paintings/lucrare-001/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/ro/lucrari/lucrare-001/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/paintings/lucrare-001/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/en/artworks/si-0002/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/paintings/si-0002/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/ro/lucrari/si-0002/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/paintings/si-0002/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/en/artworks/si-0033/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/graphics/si-0033/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/ro/lucrari/si-0033/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/graphics/si-0033/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/en/artworks/si-0004/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/graphics/si-0004/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/ro/lucrari/si-0004/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/graphics/si-0004/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/en/artworks/si-0005/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/frescoes/si-0005/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/ro/lucrari/si-0005/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/frescoes/si-0005/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/en/artworks/si-0006/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/frescoes/si-0006/full.webp</image:loc></image:image></url>
+<url><loc>https://soriniosub.com/ro/lucrari/si-0006/</loc><image:image><image:loc>https://media.soriniosub.com/artworks/frescoes/si-0006/full.webp</image:loc></image:image></url>
+</urlset>
