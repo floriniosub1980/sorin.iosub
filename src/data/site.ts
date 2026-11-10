@@ -1,6 +1,7 @@
 export const content = {
   en: {
     nav: ['Artworks','Practice','Exhibitions','About','Contact'],
+    sectionLabels: { portfolio: 'PORTFOLIO', practice: 'PRACTICE', exhibitions: 'EXHIBITIONS', artist: 'ARTIST', contact: 'CONNECT' },
     eyebrow: 'Contemporary Romanian painter',
     heroTitle: 'Between the visible and the imagined.',
     heroCopy: 'An evolving portfolio of paintings, artistic projects and exhibitions by Sorin Iosub.',
@@ -31,6 +32,7 @@ export const content = {
   },
   ro: {
     nav: ['Lucrări','Practica artistică','Expoziții','Despre','Contact'],
+    sectionLabels: { portfolio: 'PORTOFOLIU', practice: 'PRACTICĂ ARTISTICĂ', exhibitions: 'EXPOZIȚII', artist: 'DESPRE ARTIST', contact: 'CONTACT' },
     eyebrow: 'Pictor contemporan român',
     heroTitle: 'Între vizibil și imaginar.',
     heroCopy: 'Un portofoliu în dezvoltare cu picturi, proiecte artistice și expoziții semnate de Sorin Iosub.',
