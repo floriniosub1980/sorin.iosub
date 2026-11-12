@@ -23,8 +23,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Render static bilingual artwork pages and sitemap from published R2 JSON
+      - name: Check SEO generator syntax
+        run: node --check tools/seo/generate.mjs
+      - name: Render static bilingual artwork pages and galleries from published R2 JSON
         run: node tools/seo/generate.mjs
+      - name: Validate generated HTML galleries
+        run: |
+          for page in en/index.html ro/index.html en/painting-drawing/index.html ro/pictura-desen/index.html en/frescoes-monumental/index.html ro/fresce-monumentale/index.html; do
+            grep -q 'artwork-seo-static' "$page"
+          done
       - name: Check sitemap
         run: |
           test -s sitemap.xml
@@ -33,7 +40,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- en/artworks/ ro/lucrari/ sitemap.xml robots.txt public/sitemap.xml public/robots.txt
+          git add -A -- en/index.html ro/index.html en/painting-drawing/index.html ro/pictura-desen/index.html en/frescoes-monumental/index.html ro/fresce-monumentale/index.html en/artworks/ ro/lucrari/ sitemap.xml robots.txt public/sitemap.xml public/robots.txt
           if git diff --cached --quiet; then
             echo "No changes to SEO output"
           else

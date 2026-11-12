@@ -10,6 +10,35 @@ function build(catalog) {
   const section=(l,category)=>category==="frescoes"?(l==="en"?"/en/frescoes-monumental/":"/ro/fresce-monumentale/"):(l==="en"?"/en/painting-drawing/":"/ro/pictura-desen/");
   if(catalog?.schemaVersion!==1||!Array.isArray(catalog.artworks))throw Error("Invalid catalog schema");
   const files={},seen=new Set();
+  // Progressive enhancement: static cards are crawlable and remain usable without JS.
+  const galleryPages = [
+    {path:'en/index.html',lang:'en',cats:[]},
+    {path:'ro/index.html',lang:'ro',cats:[]},
+    {path:'en/painting-drawing/index.html',lang:'en',cats:['paintings','graphics']},
+    {path:'ro/pictura-desen/index.html',lang:'ro',cats:['paintings','graphics']},
+    {path:'en/frescoes-monumental/index.html',lang:'en',cats:['frescoes']},
+    {path:'ro/fresce-monumentale/index.html',lang:'ro',cats:['frescoes']}
+  ];
+  const markerStart='<!-- SEO-ARTWORKS:START -->';
+  const markerEnd='<!-- SEO-ARTWORKS:END -->';
+  const published=catalog.artworks.filter(w=>w && w.published!==false);
+  function staticArtworkCard(work,lang,index) {
+    const name=pick(work.title,lang);
+    const alt=pick(work.alt,lang)||name;
+    const link=detail(lang,work.id);
+    const categoryNames=lang==='ro'?
+      {paintings:'Pictură',graphics:'Grafică',frescoes:'Frescă'}:
+      {paintings:'Painting',graphics:'Graphic art',frescoes:'Fresco'};
+    const subtitle=[categoryNames[work.category],Number.isInteger(work.year)?String(work.year):'',pick(work.technique,lang)].filter(Boolean).join(' · ');
+    const label=lang==='ro'?'Detalii despre lucrare':'Artwork details';
+    const loading=index<3?'eager':'lazy';
+    return '<article class="art-card artwork-from-r2 artwork-seo-static">\n'+
+      '<a class="art-frame real-artwork" href="'+link+'" aria-label="'+e(label+': '+name)+'">\n'+
+      '<img src="'+e(work.images.thumbnail)+'" alt="'+e(alt)+'" loading="'+loading+'" decoding="async"></a>\n'+
+      '<div class="art-info"><div><h3><a href="'+link+'">'+e(name)+'</a></h3>'+
+      '<p class="artwork-meta">'+e(subtitle)+'</p>'+
+      '<a class="artwork-details-link" href="'+link+'">'+label+'</a></div></div></article>';
+  }
   const sitePages=["/en/","/ro/","/en/painting-drawing/","/ro/pictura-desen/","/en/frescoes-monumental/","/ro/fresce-monumentale/"].map(p=>({p}));
   for(const w of catalog.artworks.filter(x=>x&&x.published!==false)){
     if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(w.id)||seen.has(w.id))throw Error("Invalid/duplicate ID "+w.id);
@@ -73,6 +102,21 @@ ${metadata?`<p class="seo-artwork-meta">${e(metadata)}</p>`:""}
 `;
       sitePages.push({p,image:w.images.full});
     }
+  }
+  // Only generate page markup after every published artwork has passed validation.
+  if(!published.length)throw Error('Refusing to publish an empty R2 gallery');
+  for(const page of galleryPages) {
+    const target=path.join(root,page.path);
+    const source=fs.readFileSync(target,'utf8');
+    const a=source.indexOf(markerStart),b=source.indexOf(markerEnd);
+    if(a<0||b<a||source.indexOf(markerStart,a+1)!==-1||source.indexOf(markerEnd,b+1)!==-1)
+      throw Error('SEO gallery markers are missing or duplicated in '+page.path);
+    const items=published.filter(work=>!page.cats.length||page.cats.includes(work.category));
+    const fallback=page.lang==='ro'?'Nu sunt lucrări publicate în această categorie.':'No artworks published in this category.';
+    const cards=items.length?items.map((work,index)=>staticArtworkCard(work,page.lang,index)).join('\n'):
+      '<p class="artwork-message">'+fallback+'</p>';
+    const pageMarkup=source.slice(0,a)+markerStart+'\n'+cards+'\n'+markerEnd+source.slice(b+markerEnd.length);
+    files[page.path]=pageMarkup.replace(/(<div class="art-grid"[^>]*?)aria-busy="(?:true|false)"/,'$1aria-busy="false"');
   }
   const sitemap=['<?xml version="1.0" encoding="UTF-8"?>','<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',...sitePages.map(v=>`<url><loc>${domain+v.p}</loc>${v.image?`<image:image><image:loc>${e(v.image)}</image:loc></image:image>`:""}</url>`),'</urlset>',''].join("\n");
   const robots="User-agent: *\nAllow: /\nSitemap: https://soriniosub.com/sitemap.xml\n";
