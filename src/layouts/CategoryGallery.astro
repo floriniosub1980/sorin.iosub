@@ -75,11 +75,11 @@ const socialGraph = {'@context':'https://schema.org','@graph':[
 </section>
 <section class="work-section section-pad" id="artworks">
 <div class="section-head"><div><p class="eyebrow">{title}</p><h2>{lang === 'ro' ? 'Lucrări publicate' : 'Published works'}</h2></div><p>{lang === 'ro' ? 'Lucrările din catalog apar automat aici pe măsură ce sunt publicate.' : 'Artworks from the catalogue are displayed here automatically as they are published.'}</p></div>
-<div class="art-grid" data-r2-artworks={lang} data-r2-categories={scope} aria-busy="true" aria-live="polite"><p class="artwork-message">{lang === 'ro' ? 'Se încarcă lucrările…' : 'Loading artworks…'}</p></div>
+<div class="art-grid" data-r2-artworks={lang} data-r2-categories={scope} aria-busy="true" aria-live="polite"><!-- SEO-ARTWORKS:START --><p class="artwork-message">{lang === 'ro' ? 'Se încarcă lucrările…' : 'Loading artworks…'}</p><!-- SEO-ARTWORKS:END --></div>
 <p class="notice">{lang === 'ro' ? 'Titlurile și detaliile lucrărilor sunt actualizate pe măsură ce sunt confirmate de artist.' : 'Artwork titles and details are updated as they are confirmed by the artist.'}</p>
 </section>
 </main>
 <footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span>{t.rights}</span><a href="#content">{lang === 'ro' ? 'Sus' : 'Top'}</a></footer>
-<script src="/mobile.js" is:inline defer></script><script src="/gallery.js?v=20261110-canvas1" is:inline defer></script>
+<script src="/mobile.js" is:inline defer></script><script src="/gallery.js?v=20261112-seogrid1" is:inline defer></script>
 </body>
 </html>

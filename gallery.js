@@ -592,8 +592,10 @@
 
   async function load() {
     filters.hidden = true;
-    grid.setAttribute('aria-busy', 'true');
-    grid.replaceChildren(textNode('p', l.loading, 'artwork-message'));
+    // Keep crawlable static gallery links visible until live R2 data loads.
+    const hasStatic = grid.querySelector('.artwork-seo-static') !== null;
+    grid.setAttribute('aria-busy', hasStatic ? 'false' : 'true');
+    if (!hasStatic) grid.replaceChildren(textNode('p', l.loading, 'artwork-message'));
     try {
       const response = await fetch(catalogueUrl, { mode: 'cors', cache: 'no-cache' });
       if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -615,7 +617,12 @@
       renderGrid();
     } catch (error) {
       console.warn('R2 artwork catalogue unavailable:', error);
-      showNotice(l.unavailable, true);
+      // If R2 fails, retain the static HTML gallery and detail links.
+      if (grid.querySelector('.artwork-seo-static')) {
+        grid.setAttribute('aria-busy', 'false');
+      } else {
+        showNotice(l.unavailable, true);
+      }
     }
   }
 
