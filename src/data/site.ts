@@ -18,7 +18,7 @@ export const content = {
     ex1: 'Chipuri, închipuri, închipuiți',
     ex1copy: 'Muzeul Apei, Timișoara · 2026',
     ex2: '40 / Metafora',
-    ex2copy: 'Galeria Odeon (în incinta Teatrului Odeon), București · 2015',
+    ex2copy: 'Odeon Gallery (inside the Odeon Theatre), Bucharest · 2015',
     ex3: 'Metehne',
     ex3copy: 'National Library of Romania, Bucharest · 2017–2018',
     about: 'About the artist',
