@@ -335,3 +335,11 @@
   overscroll-behavior: contain;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Artist biography: readable paragraphs and an unobtrusive citation. */
+.about-copy p + p{margin-top:18px}
+.about-copy .about-source{margin-top:19px;font-size:.83rem;line-height:1.5;color:#72736b}
+.about-source a{text-decoration:underline;text-underline-offset:3px}
+.about-source a:hover{color:#30332e}
+.about-source a:focus-visible{outline:3px solid #9b533e;outline-offset:3px}
+@media(max-width:540px){.about-copy p:first-child{margin-top:28px}.about-copy p + p{margin-top:17px}.about-copy .about-source{margin-top:18px;font-size:.78rem}}
