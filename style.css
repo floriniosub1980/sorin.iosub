@@ -339,3 +339,11 @@
 /* Artist biography: readable paragraphs. */
 .about-copy p + p{margin-top:18px}
 @media(max-width:540px){.about-copy p:first-child{margin-top:28px}.about-copy p + p{margin-top:17px}}
+
+/* Instagram social links: contact and all page footers. */
+.social-line{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px}
+.social-line .social-separator{color:#8e887e}
+.site-footer .footer-instagram{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 26px;align-self:center}
+.site-footer .footer-instagram svg{display:block}
+.site-footer .footer-instagram:hover{color:#242622}
+.site-footer .footer-instagram:focus-visible,.social-line a:focus-visible{outline:3px solid #9b533e;outline-offset:4px}
