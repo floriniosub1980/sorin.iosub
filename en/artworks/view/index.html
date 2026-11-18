@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sorin Iosub — Portofoliu</title>
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#f6f4ef">
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/responsive.css">
+<link rel="preconnect" href="https://media.soriniosub.com">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<a class="skip" href="#content" id="skip-link">Sari la conținut</a>
+<header class="site-header">
+<a class="brand" id="brand" href="/ro/">SORIN <span>IOSUB</span></a>
+<nav aria-label="Navigare principală" id="main-nav"><a href="/ro/#artworks">Portofoliu</a><a href="/ro/#practice">Practica artistică</a><a href="/ro/#about">Despre</a><a href="/ro/#contact">Contact</a></nav>
+<a class="lang" id="language-switch" href="/en/"><img class="language-flag" id="language-flag" src="/flags/gb.svg" width="22" height="15" alt="" aria-hidden="true"><span id="language-label">English</span></a>
+<details class="mobile-menu"><summary aria-label="Deschide meniul"><span class="menu-label" id="menu-label">Meniu</span><span class="menu-lines" aria-hidden="true"><span></span><span></span></span></summary>
+<nav aria-label="Navigare mobilă" id="mobile-nav"><a href="/ro/#artworks">Portofoliu</a><a href="/ro/#practice">Practica artistică</a><a href="/ro/#about">Despre</a><a href="/ro/#contact">Contact</a><a class="mobile-language" href="/en/">English</a></nav></details>
+</header>
+<main id="content" class="seo-artwork-page">
+<section class="section-pad seo-artwork-content">
+<nav class="seo-breadcrumb" id="crumb"><a href="/ro/#artworks">Portofoliu</a></nav>
+<p class="eyebrow" id="eyebrow">SORIN IOSUB / PORTOFOLIU</p>
+<h1 id="page-heading" style="font-size:clamp(2.3rem,5vw,4rem)">Se încarcă lucrarea…</h1>
+<p id="page-status" role="status" aria-live="polite"></p>
+<div id="artwork-content" class="seo-artwork-layout" hidden>
+<div class="seo-artwork-figure"><a id="artwork-image-link" href="#" target="_blank" rel="noopener noreferrer"><img id="artwork-image" alt="" loading="eager" decoding="async"></a></div>
+<div class="seo-artwork-text">
+<p class="seo-artwork-meta" id="artwork-meta"></p>
+<p class="seo-artwork-description" id="artwork-description"></p>
+<div class="seo-artwork-actions"><a id="artwork-full-link" href="#" target="_blank" rel="noopener noreferrer"></a><a id="artwork-category-link" href="#"></a><a id="artwork-other-link" href="/ro/#artworks">Alte lucrări</a></div>
+</div></div>
+</section>
+</main>
+<footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span id="footer-rights">Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor.</span><a href="/ro/#artworks" id="footer-home">Portofoliu</a></footer>
+<script src="/mobile.js" defer></script>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const route = location.pathname.replace(/\/+$/, '').match(/^\/(en\/artworks|ro\/lucrari)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  const requestedId = new URLSearchParams(location.search).get('id');
+  const queryValid = typeof requestedId === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(requestedId);
+  const match = route && route[2] === 'view' ? (queryValid ? [route[0], route[1], requestedId] : null) : route;
+  const lang = match && match[1].startsWith('en') ? 'en' : 'ro';
+  const home = '/' + lang + '/';
+  const tx = {
+    en: {loading:'Loading artwork…', missing:'Artwork not found', unavailable:'Artwork details are temporarily unavailable. Please try again.',home:'Portfolio',practice:'Practice',about:'About',contact:'Contact',other:'Other artworks',view:'View full image',menu:'Menu',skip:'Skip to content',language:'Română',rights:'Artwork imagery remains the property of the respective rights holders.',paintings:'Painting',graphics:'Graphic art',frescoes:'Fresco',pnt:'Painting & drawing',frs:'Frescoes & monumental projects'},
+    ro: {loading:'Se încarcă lucrarea…',missing:'Lucrarea nu a fost găsită',unavailable:'Detaliile lucrării sunt momentan indisponibile. Încercați din nou.',home:'Portofoliu',practice:'Practica artistică',about:'Despre',contact:'Contact',other:'Alte lucrări',view:'Vezi imaginea completă',menu:'Meniu',skip:'Sari la conținut',language:'English',rights:'Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor.',paintings:'Pictură',graphics:'Grafică',frescoes:'Frescă',pnt:'Pictură și desen',frs:'Frescă și proiecte monumentale'}
+  }[lang];
+  document.documentElement.lang = lang;
+  const otherLang = lang === 'en' ? 'ro' : 'en';
+  const otherWork = match ? '/' + (otherLang === 'en' ? 'en/artworks' : 'ro/lucrari') + '/view/?id=' + encodeURIComponent(match[2]) : '/' + otherLang + '/';
+  $('brand').href = home;
+  $('skip-link').textContent = tx.skip;
+  $('menu-label').textContent = tx.menu;
+  $('language-switch').href = otherWork;
+  $('language-label').textContent = tx.language;
+  $('language-flag').src = '/flags/' + (otherLang === 'ro' ? 'ro' : 'gb') + '.svg';
+  const navigation = [['#artworks',tx.home],['#practice',tx.practice],['#about',tx.about],['#contact',tx.contact]];
+  for (const [navId, mobile] of [['main-nav',false],['mobile-nav',true]]) {
+    const nav = $(navId);
+    nav.replaceChildren();
+    navigation.forEach(([hash,label]) => {const link=document.createElement('a');link.href=home+hash;link.textContent=label;nav.append(link);});
+    if(mobile){const switcher=document.createElement('a');switcher.className='mobile-language';switcher.href=otherWork;switcher.textContent=tx.language;nav.append(switcher);}
+  }
+  $('footer-rights').textContent=tx.rights;
+  $('footer-home').textContent=tx.home;
+  $('footer-home').href=home+'#artworks';
+  $('artwork-other-link').textContent=tx.other;
+  $('artwork-other-link').href=home+'#artworks';
+  $('artwork-full-link').textContent=tx.view;
+  $('eyebrow').textContent='SORIN IOSUB / '+tx.home.toUpperCase();
+  $('page-heading').textContent=match?tx.loading:tx.missing;
+  document.title=match?tx.loading+' — Sorin Iosub':tx.missing+' — Sorin Iosub';
+  const crumb=document.createElement('a');crumb.href=home+'#artworks';crumb.textContent=tx.home;$('crumb').replaceChildren(crumb);
+  if(!match){$('page-status').textContent=tx.missing;return;}
+  function localized(v){if(typeof v==='string')return v;if(v && typeof v==='object')return v[lang]||v[otherLang]||'';return '';}
+  function safeMedia(v){try {const u=new URL(v);return u.protocol==='https:'&&u.host==='media.soriniosub.com'&&u.pathname.startsWith('/artworks/')&&u.pathname.endsWith('.webp')?u.href:null;}catch{return null;}}
+  function normalCategory(value){const key=String(value||'').toLowerCase().trim();return ({painting:'paintings',pictura:'paintings',graphic:'graphics',grafica:'graphics',fresco:'frescoes',fresca:'frescoes'})[key]||key;}
+  async function load(){
+    try {
+      const res=await fetch('https://media.soriniosub.com/data/artworks.json',{mode:'cors',cache:'no-cache',signal:AbortSignal.timeout(20000)});
+      if(!res.ok)throw Error('Catalogue HTTP '+res.status);
+      const data=await res.json();
+      if(data.schemaVersion!==1||!Array.isArray(data.artworks))throw Error('Invalid catalogue');
+      const w=data.artworks.find(x=>x&&x.id===match[2]&&x.published!==false);
+      if(!w){$('page-heading').textContent=tx.missing;$('page-status').textContent=tx.missing;document.title=tx.missing+' — Sorin Iosub';return;}
+      const url=safeMedia(w.images?.full);
+      if(!url)throw Error('Invalid image URL');
+      const title=localized(w.title)||w.id;
+      const cat=normalCategory(w.category);
+      const categoryName=tx[cat]||cat;
+      const section=cat==='frescoes'?(lang==='en'?'/en/frescoes-monumental/':'/ro/fresce-monumentale/'):(lang==='en'?'/en/painting-drawing/':'/ro/pictura-desen/');
+      $('page-heading').textContent=title;
+      $('eyebrow').textContent='SORIN IOSUB / '+(cat==='frescoes'?tx.frs:tx.pnt);
+      document.title=title+' — Sorin Iosub';
+      const meta=[categoryName,Number.isInteger(w.year)?String(w.year):'',localized(w.technique),Number.isFinite(w.dimensionsCm?.width)&&Number.isFinite(w.dimensionsCm?.height)?w.dimensionsCm.width+' × '+w.dimensionsCm.height+' cm':''].filter(Boolean).join(' · ');
+      $('artwork-meta').textContent=meta;
+      const description=localized(w.description);
+      $('artwork-description').textContent=description;
+      $('artwork-description').hidden=!description;
+      $('artwork-image-link').href=url;
+      $('artwork-image-link').setAttribute('aria-label',tx.view+': '+title);
+      $('artwork-image').src=url;
+      $('artwork-image').alt=localized(w.alt)||title;
+      $('artwork-full-link').href=url;
+      $('artwork-category-link').href=section;
+      $('artwork-category-link').textContent=cat==='frescoes'?tx.frs:tx.pnt;
+      const first=document.createElement('a');first.href=home+'#artworks';first.textContent=tx.home;
+      const second=document.createElement('a');second.href=section;second.textContent=cat==='frescoes'?tx.frs:tx.pnt;
+      $('crumb').replaceChildren(first,document.createTextNode(' / '),second,document.createTextNode(' / '+title));
+      $('page-status').textContent='';
+      $('artwork-content').hidden=false;
+    } catch(error) {
+      console.warn('Could not load artwork details from R2:',error);
+      $('page-heading').textContent=tx.unavailable;
+      $('page-status').textContent=tx.unavailable;
+    }
+  }
+  load();
+})();
+</script>
+</body></html>
