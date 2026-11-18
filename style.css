@@ -353,3 +353,10 @@
 .artist-cv-link a{display:inline-flex;align-items:center;min-height:44px;padding:7px 0 8px;border-bottom:1px solid #9b533e;font:600 .88rem 'DM Sans',sans-serif;letter-spacing:.025em;text-decoration:none;color:#242622}
 .artist-cv-link a:hover{color:#9b533e}
 .artist-cv-link a:focus-visible{outline:3px solid #9b533e;outline-offset:4px}
+
+/* Matching Facebook and Instagram icons, grouped as a consistent footer control. */
+.site-footer .footer-socials{display:inline-flex;align-items:center;gap:8px;align-self:center;flex:0 0 auto}
+.site-footer .footer-socials a{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 26px}
+.site-footer .footer-socials svg{display:block}
+.site-footer .footer-socials a:hover{color:#242622}
+.site-footer .footer-socials a:focus-visible{outline:3px solid #9b533e;outline-offset:4px}
