@@ -552,7 +552,10 @@
     if (typeof work.id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(work.id)) {
       const detailLink = document.createElement('a');
       detailLink.className = 'artwork-details-link';
-      detailLink.href = '/' + lang + '/' + (lang === 'en' ? 'artworks' : 'lucrari') + '/' + work.id + '/';
+      // Static SEO pages exist for original artworks; later uploads use a guaranteed 200 detail route.
+      const staticDetailIds = new Set(["lucrare-001","si-0002","si-0003","si-0004","si-0005","si-0006","si-0013","si-0014","sib-00010","sib-0009","sig-0007","sig-0008","sip-0011","sip-0012"]);
+      const detailBase = '/' + lang + '/' + (lang === 'en' ? 'artworks' : 'lucrari');
+      detailLink.href = staticDetailIds.has(work.id) ? detailBase + '/' + work.id + '/' : detailBase + '/view/?id=' + encodeURIComponent(work.id);
       detailLink.textContent = l.detailLink;
       content.append(detailLink);
     }
