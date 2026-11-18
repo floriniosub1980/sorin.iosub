@@ -15,6 +15,29 @@
     else footer.append(link);
   }
 
+  // Place Facebook next to Instagram with matching footer icon styling on all pages.
+  if (footer && !footer.querySelector('.footer-facebook')) {
+    const instagram = footer.querySelector('.footer-instagram');
+    const socials = document.createElement('span');
+    socials.className = 'footer-socials';
+    const facebook = document.createElement('a');
+    facebook.className = 'footer-facebook';
+    facebook.href = 'https://www.facebook.com/sorin.iosub.9/';
+    facebook.target = '_blank';
+    facebook.rel = 'noopener noreferrer';
+    facebook.setAttribute('aria-label', 'Facebook — Sorin Iosub');
+    facebook.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5"></rect><path d="M14.8 7h-1.5c-1.2 0-1.7.6-1.7 1.7V11h3l-.4 2.7h-2.6V20M9 11h2.6"></path></svg>';
+    if (instagram) {
+      instagram.before(socials);
+      socials.append(facebook, instagram);
+    } else {
+      socials.append(facebook);
+      const topLink = footer.querySelector('a[href="#content"]');
+      if (topLink) topLink.before(socials);
+      else footer.append(socials);
+    }
+  }
+
   const menu = document.querySelector('.mobile-menu');
   if (!menu) return;
   menu.querySelectorAll('nav a').forEach(link => {
