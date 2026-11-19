@@ -140,7 +140,7 @@ async function run(){
   for(const base of ['en/artworks','ro/lucrari']){
     const folder=path.join(root,base);
     if(fs.existsSync(folder))for(const dir of fs.readdirSync(folder,{withFileTypes:true})){
-      if(!dir.isDirectory()||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(dir.name))continue;
+      if(!dir.isDirectory()||dir.name==='view'||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(dir.name))continue;
       if(!wanted.has(base+'/'+dir.name+'/index.html'))fs.rmSync(path.join(folder,dir.name),{recursive:true,force:true});
     }
   }
