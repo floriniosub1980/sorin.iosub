@@ -38,6 +38,16 @@
     }
   }
 
+  // Existing static artwork pages also need current R2 metadata, not stale generated copy.
+  if (/^\/(?:en\/artworks|ro\/lucrari)\/[a-z0-9]+(?:-[a-z0-9]+)*\/?$/.test(location.pathname)
+      && !location.pathname.includes('/view/') && !document.querySelector('script[data-artwork-refresh]')) {
+    const detailScript = document.createElement('script');
+    detailScript.src = '/artwork-detail.js?v=20261119-1';
+    detailScript.defer = true;
+    detailScript.dataset.artworkRefresh = 'true';
+    document.head.append(detailScript);
+  }
+
   const menu = document.querySelector('.mobile-menu');
   if (!menu) return;
   menu.querySelectorAll('nav a').forEach(link => {
