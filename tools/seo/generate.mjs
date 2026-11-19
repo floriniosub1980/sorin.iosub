@@ -5,7 +5,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 function build(catalog) {
   const domain="https://soriniosub.com",host="https://media.soriniosub.com";
   const e=x=>String(x??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-  const pick=(x,l)=>typeof x==="string"?x:x?.[l]||x?.ro||x?.en||"";
+  const pick=(x,l)=>typeof x==="string"?x:(x&&typeof x==="object"&&Object.prototype.hasOwnProperty.call(x,l))?(x[l]??""):(x?.ro??x?.en??"");
   const detail=(l,id)=>"/"+l+"/"+(l==="en"?"artworks":"lucrari")+"/"+id+"/";
   const section=(l,category)=>category==="frescoes"?(l==="en"?"/en/frescoes-monumental/":"/ro/fresce-monumentale/"):(l==="en"?"/en/painting-drawing/":"/ro/pictura-desen/");
   if(catalog?.schemaVersion!==1||!Array.isArray(catalog.artworks))throw Error("Invalid catalog schema");
@@ -94,11 +94,11 @@ function build(catalog) {
 <div class="seo-artwork-layout"><div class="seo-artwork-figure"><a href="${e(w.images.full)}" target="_blank" rel="noopener noreferrer" aria-label="${text.view}: ${e(title)}"><img src="${e(w.images.full)}" alt="${e(alt)}" loading="eager" decoding="async" fetchpriority="high"></a></div>
 <div class="seo-artwork-text"><p class="eyebrow">SORIN IOSUB / ${e(category)}</p><h1>${e(title)}</h1>
 ${metadata?`<p class="seo-artwork-meta">${e(metadata)}</p>`:""}
-<p class="seo-artwork-description">${e(description||text.notes)}</p>
+${description?`<p class="seo-artwork-description">${e(description)}</p>`:""}
 <div class="seo-artwork-actions"><a href="${e(w.images.full)}" target="_blank" rel="noopener noreferrer">${text.view}</a><a href="${section(lang,w.category)}">${e(category)}</a><a href="/${lang}/#artworks">${text.more}</a></div>
 </div></div></section></main>
 <footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span>${text.rights}</span><a href="/${lang}/#artworks">${text.home}</a></footer>
-<script src="/mobile.js" defer></script></body></html>
+<script src="/mobile.js" defer></script><script src="/artwork-detail.js?v=20261119-1" data-artwork-refresh defer></script></body></html>
 `;
       sitePages.push({p,image:w.images.full});
     }
