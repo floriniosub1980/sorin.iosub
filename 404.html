@@ -40,8 +40,11 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const match = location.pathname.replace(/\/+$/, '').match(/^\/(en\/artworks|ro\/lucrari)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
-  const lang = match && match[1].startsWith('en') ? 'en' : 'ro';
+  const route = location.pathname.replace(/\/+$/, '').match(/^\/(en\/artworks|ro\/lucrari)\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  const idParam = new URLSearchParams(location.search).get('id');
+  const validIdParam = typeof idParam === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(idParam);
+  const match = route && route[2] === 'view' ? (validIdParam ? [route[0], route[1], idParam] : null) : route;
+  const lang = (route && route[1].startsWith('en')) ? 'en' : 'ro';
   const home = '/' + lang + '/';
   const tx = {
     en: {loading:'Loading artwork…', missing:'Artwork not found', unavailable:'Artwork details are temporarily unavailable. Please try again.',home:'Portfolio',practice:'Practice',about:'About',contact:'Contact',other:'Other artworks',view:'View full image',menu:'Menu',skip:'Skip to content',language:'Română',rights:'Artwork imagery remains the property of the respective rights holders.',paintings:'Painting',graphics:'Graphic art',frescoes:'Fresco',pnt:'Painting & drawing',frs:'Frescoes & monumental projects'},
