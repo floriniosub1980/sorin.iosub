@@ -371,7 +371,7 @@
 .testimonials-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
 .testimonials-list[hidden],.testimonials-empty[hidden]{display:none}
 .testimonial-card{border:1px solid #ccc5b9;background:#f6f4ef;padding:clamp(28px,3.5vw,48px);min-width:0;display:flex;flex-direction:column;align-items:flex-start}
-.testimonial-quote{margin:0 0 32px;padding:0;border:0;font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.35rem,2vw,1.9rem);line-height:1.5;font-weight:400;overflow-wrap:anywhere}
+.testimonial-quote{margin:0 0 32px;padding:0;border:0;font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.05rem,1.45vw,1.3rem);line-height:1.65;font-weight:400;overflow-wrap:anywhere}
 .testimonial-author{margin:auto 0 0;font-size:.95rem;font-weight:600;letter-spacing:.02em}
 .testimonial-role{margin:8px 0 0;color:#66675f;font-size:.84rem;line-height:1.6}
 .testimonial-source{margin:16px 0 0;font-size:.8rem}
@@ -384,11 +384,11 @@
 /* Artist's own words, deliberately distinct from third-party testimonials. */
 .artist-motto{position:relative;margin:88px 0 0;padding:40px 0 0;border-top:1px solid #c9c4bb}
 .artist-motto .eyebrow{color:#89614e;margin-bottom:25px}
-.artist-motto-quote{max-width:1050px;margin:0;padding:0;border:0;font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.38rem,2.5vw,2.15rem);font-weight:400;line-height:1.52;letter-spacing:-.015em}
+.artist-motto-quote{max-width:1050px;margin:0;padding:0;border:0;font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.1rem,1.65vw,1.5rem);font-weight:400;line-height:1.52;letter-spacing:-.015em}
 .artist-motto-quote p{font-size:inherit;line-height:inherit;color:#353833;margin:0 0 22px;max-width:100%}
 .artist-motto-credit{font-size:.82rem;font-weight:600;letter-spacing:.06em;color:#7a5a4e;margin-top:24px}
 @media(max-width:900px){.artist-motto{margin-top:64px;padding-top:32px}}
-@media(max-width:640px){.artist-motto{margin-top:42px;padding-top:27px}.artist-motto-quote{font-size:clamp(1.25rem,5.1vw,1.6rem)}.artist-motto-quote p{margin-bottom:19px}}
+@media(max-width:640px){.artist-motto{margin-top:42px;padding-top:27px}.artist-motto-quote{font-size:clamp(1.03rem,4vw,1.2rem)}.artist-motto-quote p{margin-bottom:19px}}
 
 
 /* Source-attributed editorial digests are not presented as verbatim quotes. */
