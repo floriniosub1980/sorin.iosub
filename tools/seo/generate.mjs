@@ -24,7 +24,7 @@ function build(catalog) {
   const published=catalog.artworks.filter(w=>w && w.published!==false);
   // Selected homepage artworks: two paintings, two graphics, two frescoes.
   // Keep this order stable across RO/EN and future R2 catalogue updates.
-  const featuredIds=['lucrare-001','si-0002','sig-0015','sig-0008','sib-0027','sib-0046'];
+  const featuredIds=['lucrare-001','si-0002','sig-0015','sig-0008','sib-0037','sib-0050'];
   function staticArtworkCard(work,lang,index) {
     const name=pick(work.title,lang);
     const alt=pick(work.alt,lang)||name;
