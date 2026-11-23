@@ -379,3 +379,13 @@
 .testimonial-source a:hover{color:#9b533e}
 @media(max-width:900px){.testimonials-section .testimonials-head{display:block}.testimonials-section .testimonials-head>p{margin-top:18px}.testimonials-list{grid-template-columns:1fr}}
 @media(max-width:640px){.testimonials-section .testimonials-head{margin-bottom:36px}.testimonial-card{padding:28px}.testimonials-empty{font-size:.96rem}}
+
+
+/* Artist's own words, deliberately distinct from third-party testimonials. */
+.artist-motto{position:relative;margin:88px 0 0;padding:40px 0 0;border-top:1px solid #c9c4bb}
+.artist-motto .eyebrow{color:#89614e;margin-bottom:25px}
+.artist-motto-quote{max-width:1050px;margin:0;padding:0;border:0;font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.38rem,2.5vw,2.15rem);font-weight:400;line-height:1.52;letter-spacing:-.015em}
+.artist-motto-quote p{font-size:inherit;line-height:inherit;color:#353833;margin:0 0 22px;max-width:100%}
+.artist-motto-credit{font-size:.82rem;font-weight:600;letter-spacing:.06em;color:#7a5a4e;margin-top:24px}
+@media(max-width:900px){.artist-motto{margin-top:64px;padding-top:32px}}
+@media(max-width:640px){.artist-motto{margin-top:42px;padding-top:27px}.artist-motto-quote{font-size:clamp(1.25rem,5.1vw,1.6rem)}.artist-motto-quote p{margin-bottom:19px}}
