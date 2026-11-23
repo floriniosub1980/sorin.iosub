@@ -14,7 +14,7 @@
       },
       "format": "editorial_summary",
       "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
-      "published": true
+      "published": false
     },
     {
       "id": "valentin-ciuca",
@@ -25,7 +25,7 @@
       },
       "format": "editorial_summary",
       "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
-      "published": true
+      "published": false
     },
     {
       "id": "ioan-iovan",
@@ -36,7 +36,7 @@
       },
       "format": "editorial_summary",
       "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
-      "published": true
+      "published": false
     },
     {
       "id": "mihai-plamadeala",
@@ -51,7 +51,7 @@
       },
       "format": "editorial_summary",
       "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
-      "published": true
+      "published": false
     },
     {
       "id": "vasile-craita-mandra",
@@ -62,7 +62,7 @@
       },
       "format": "editorial_summary",
       "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
-      "published": true
+      "published": false
     }
   ]
 }
