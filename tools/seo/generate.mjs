@@ -60,7 +60,7 @@ function build(catalog) {
       if(Number.isInteger(w.year))artwork.dateCreated=String(w.year);
       if(pick(w.technique,lang))artwork.artMedium=pick(w.technique,lang);
       const schema={"@context":"https://schema.org","@graph":[{"@type":"Person","@id":domain+"/#artist","name":"Sorin Iosub","url":domain+"/en/"},{"@type":"ImageObject","@id":absolute+"#image","contentUrl":w.images.full,"caption":alt,"creditText":"Artwork: Sorin Iosub"},artwork,{"@type":"WebPage","@id":absolute+"#page","url":absolute,"name":title,"mainEntity":{"@id":absolute+"#artwork"},"primaryImageOfPage":{"@id":absolute+"#image"},"inLanguage":lang}]};
-      const text=en?{home:"Portfolio",practice:"Practice",contact:"Contact",about:"About",view:"View full image",more:"Other artworks",notes:"Details to be confirmed with the artist",language:"Română",rights:"Artwork imagery remains the property of its respective rights holders."}:{home:"Portofoliu",practice:"Practica artistică",contact:"Contact",about:"Despre",view:"Vezi imaginea completă",more:"Alte lucrări",notes:"Detalii în curs de confirmare cu artistul",language:"English",rights:"Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor."};
+      const text=en?{home:"Portfolio",practice:"Practice",contact:"Contact",about:"About",view:"View full image",more:"Other artworks",testimonials:"Testimonials",notes:"Details to be confirmed with the artist",language:"Română",rights:"Artwork imagery remains the property of its respective rights holders."}:{home:"Portofoliu",practice:"Practica artistică",contact:"Contact",about:"Despre",view:"Vezi imaginea completă",more:"Alte lucrări",testimonials:"Testimoniale",notes:"Detalii în curs de confirmare cu artistul",language:"English",rights:"Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor."};
       files[p.slice(1)+"index.html"]=`<!doctype html>
 <html lang="${lang}"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -87,10 +87,10 @@ function build(catalog) {
 <a class="skip" href="#content">${en?"Skip to content":"Sari la conținut"}</a>
 <header class="site-header"><a class="brand" href="/${lang}/">SORIN <span>IOSUB</span></a>
 <nav aria-label="${en?"Main navigation":"Navigare principală"}">
-<a href="/${lang}/#artworks">${text.home}</a><a href="/${lang}/#practice">${text.practice}</a><a href="/${lang}/#about">${text.about}</a><a href="/${lang}/#contact">${text.contact}</a></nav>
+<a href="/${lang}/#artworks">${text.home}</a><a href="/${lang}/#practice">${text.practice}</a><a href="/${lang}/#about">${text.about}</a><a href="/${lang}/#testimonials">${text.testimonials}</a><a href="/${lang}/#contact">${text.contact}</a></nav>
 <a class="lang" href="${detail(other,w.id)}"><img class="language-flag" src="/flags/${other==="ro"?"ro":"gb"}.svg" width="22" height="15" alt="" aria-hidden="true"> ${text.language}</a>
 <details class="mobile-menu"><summary aria-label="${en?"Open navigation":"Deschide meniul"}"><span class="menu-label">${en?"Menu":"Meniu"}</span><span class="menu-lines" aria-hidden="true"><span></span><span></span></span></summary>
-<nav aria-label="${en?"Mobile navigation":"Navigare mobilă"}"><a href="/${lang}/#artworks">${text.home}</a><a href="/${lang}/#practice">${text.practice}</a><a href="/${lang}/#about">${text.about}</a><a href="/${lang}/#contact">${text.contact}</a><a class="mobile-language" href="${detail(other,w.id)}">${text.language}</a></nav></details>
+<nav aria-label="${en?"Mobile navigation":"Navigare mobilă"}"><a href="/${lang}/#artworks">${text.home}</a><a href="/${lang}/#practice">${text.practice}</a><a href="/${lang}/#about">${text.about}</a><a href="/${lang}/#testimonials">${text.testimonials}</a><a href="/${lang}/#contact">${text.contact}</a><a class="mobile-language" href="${detail(other,w.id)}">${text.language}</a></nav></details>
 </header>
 <main id="content" class="seo-artwork-page"><section class="section-pad seo-artwork-content">
 <nav class="seo-breadcrumb"><a href="/${lang}/#artworks">${text.home}</a> / <a href="${section(lang,w.category)}">${e(category)}</a> / ${e(title)}</nav>
