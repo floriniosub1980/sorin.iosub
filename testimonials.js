@@ -10,7 +10,8 @@
     ro: 'Recomandările și mărturiile despre activitatea artistului vor fi publicate aici.',
     en: 'Endorsements and reflections on the artist’s work will be published here.'
   };
-  const linkText = {ro: 'Sursă', en: 'Source'};
+  const linkText = {ro: 'Textul original', en: 'Original text'};
+  const summaryLabel = {ro: 'Sinteză editorială a textului critic', en: 'Editorial summary of the critical text'};
   const list = container.querySelector('.testimonials-list');
   const empty = container.querySelector('.testimonials-empty');
   if (!list || !empty) return;
@@ -60,8 +61,10 @@
         const quote = localized(item.quote).trim();
         const article = document.createElement('article');
         article.className = 'testimonial-card';
-        const block = makeText('blockquote',quote,'testimonial-quote');
+        const isSummary = item.format === 'editorial_summary';
+        const block = makeText(isSummary ? 'p' : 'blockquote', quote, 'testimonial-quote');
         const author = makeText('p',item.author.trim(),'testimonial-author');
+        if (isSummary) article.append(makeText('p', summaryLabel[lang], 'testimonial-format'));
         article.append(block,author);
         const title = localized(item.role);
         if (title.trim()) article.append(makeText('p',title.trim(),'testimonial-role'));
