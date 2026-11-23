@@ -22,6 +22,9 @@ function build(catalog) {
   const markerStart='<!-- SEO-ARTWORKS:START -->';
   const markerEnd='<!-- SEO-ARTWORKS:END -->';
   const published=catalog.artworks.filter(w=>w && w.published!==false);
+  // Selected homepage artworks: two paintings, two graphics, two frescoes.
+  // Keep this order stable across RO/EN and future R2 catalogue updates.
+  const featuredIds=['lucrare-001','si-0002','sig-0015','sig-0008','sib-0027','sib-0046'];
   function staticArtworkCard(work,lang,index) {
     const name=pick(work.title,lang);
     const alt=pick(work.alt,lang)||name;
@@ -111,7 +114,10 @@ ${description?`<p class="seo-artwork-description">${e(description)}</p>`:""}
     const a=source.indexOf(markerStart),b=source.indexOf(markerEnd);
     if(a<0||b<a||source.indexOf(markerStart,a+1)!==-1||source.indexOf(markerEnd,b+1)!==-1)
       throw Error('SEO gallery markers are missing or duplicated in '+page.path);
-    const items=published.filter(work=>!page.cats.length||page.cats.includes(work.category));
+    const items=!page.cats.length
+      ? featuredIds.map(id=>published.find(work=>work.id===id))
+      : published.filter(work=>page.cats.includes(work.category));
+    if(items.some(work=>!work))throw Error('Selected homepage artwork missing from R2 catalogue');
     const fallback=page.lang==='ro'?'Nu sunt lucrări publicate în această categorie.':'No artworks published in this category.';
     const cards=items.length?items.map((work,index)=>staticArtworkCard(work,page.lang,index)).join('\n'):
       '<p class="artwork-message">'+fallback+'</p>';
