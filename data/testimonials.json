@@ -1,4 +1,68 @@
 {
   "schemaVersion": 1,
-  "testimonials": []
+  "testimonials": [
+    {
+      "id": "christian-paraschiv",
+      "author": "Christian Paraschiv",
+      "role": {
+        "ro": "Artist vizual",
+        "en": "Visual artist"
+      },
+      "quote": {
+        "ro": "Christian Paraschiv observă modul în care Sorin Iosub reinterpretează tradiția picturală printr-un limbaj personal, combinând sensibilitatea suprarealistă cu tehnici diverse. În viziunea sa, creația artistului pune în dialog imaginația, experiența și nostalgia.",
+        "en": "Christian Paraschiv highlights how Sorin Iosub reinterprets pictorial tradition through a personal visual language, bringing together surrealist sensibility and varied techniques. He sees the work as an encounter between imagination, lived experience and nostalgia."
+      },
+      "format": "editorial_summary",
+      "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
+      "published": true
+    },
+    {
+      "id": "valentin-ciuca",
+      "author": "Valentin Ciucă",
+      "quote": {
+        "ro": "Valentin Ciucă evidențiază imaginația intensă a pictorului, bogăția detaliilor și apropierea de imaginarul fantastic. Remarcă spiritul ludic și felul în care artistul reinterpretează motive tradiționale și teme clasice într-o expresie contemporană.",
+        "en": "Valentin Ciucă emphasizes the painter’s striking imagination, intricate detail and affinity with the fantastic. He also notes a playful spirit and the reinterpretation of traditional motifs and classical subjects in a contemporary visual language."
+      },
+      "format": "editorial_summary",
+      "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
+      "published": true
+    },
+    {
+      "id": "ioan-iovan",
+      "author": "Ioan Iovan",
+      "quote": {
+        "ro": "Ioan Iovan analizează universul de figuri hibride și metamorfoze din pictura lui Sorin Iosub. Consideră că tensiunea dintre forme și complexitatea reprezentărilor conturează o identitate artistică proprie, aflată între fantasticul medieval și cel modern.",
+        "en": "Ioan Iovan explores the hybrid figures and metamorphoses that inhabit Sorin Iosub’s painting. He suggests that the tension between forms and the complexity of the imagery establish a distinctive artistic identity between medieval and modern visions of the fantastic."
+      },
+      "format": "editorial_summary",
+      "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
+      "published": true
+    },
+    {
+      "id": "mihai-plamadeala",
+      "author": "Mihai Plămădeală",
+      "role": {
+        "ro": "Critic de artă",
+        "en": "Art critic"
+      },
+      "quote": {
+        "ro": "Mihai Plămădeală identifică influențe suprarealiste și dadaiste în creația lui Sorin Iosub, susținute de o gândire plastică coerentă. Apreciază stăpânirea mijloacelor tehnice, controlul compozițiilor și deschiderea spre experiment, fără pierderea echilibrului expresiv.",
+        "en": "Mihai Plămădeală identifies surrealist and Dada influences in Sorin Iosub’s art, supported by a coherent visual approach. He values the artist’s technical command, compositional control and openness to experimentation without sacrificing expressive balance."
+      },
+      "format": "editorial_summary",
+      "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
+      "published": true
+    },
+    {
+      "id": "vasile-craita-mandra",
+      "author": "Vasile Crăiță Mândră",
+      "quote": {
+        "ro": "Vasile Crăiță Mândră pune în valoare siguranța cu care Sorin Iosub tratează forma și culoarea, precum și rafinamentul tușei. Descrie un univers vizual distinct, plin de personaje imaginare, transparențe și lumină, construit cu sensibilitate și virtuozitate.",
+        "en": "Vasile Crăiță Mândră praises Sorin Iosub’s confident handling of form and colour, together with the refinement of his brushwork. He describes a distinctive visual universe of imagined creatures, transparency and light, shaped with sensitivity and virtuosity."
+      },
+      "format": "editorial_summary",
+      "sourceUrl": "https://www.contemporanii.org/artisti/sorin-iosub",
+      "published": true
+    }
+  ]
 }
