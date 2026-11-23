@@ -10,7 +10,6 @@
     ro: 'Recomandările și mărturiile despre activitatea artistului vor fi publicate aici.',
     en: 'Endorsements and reflections on the artist’s work will be published here.'
   };
-  const linkText = {ro: 'Textul original', en: 'Original text'};
   const summaryLabel = {ro: 'Sinteză editorială a textului critic', en: 'Editorial summary of the critical text'};
   const list = container.querySelector('.testimonials-list');
   const empty = container.querySelector('.testimonials-empty');
@@ -24,16 +23,6 @@
     }
     return typeof value[lang === 'ro' ? 'en' : 'ro'] === 'string'
       ? value[lang === 'ro' ? 'en' : 'ro'] : '';
-  }
-
-  function sourceUrl(value) {
-    if (typeof value !== 'string') return null;
-    try {
-      const url = new URL(value);
-      return ['https:', 'http:'].includes(url.protocol) ? url.href : null;
-    } catch {
-      return null;
-    }
   }
 
   function makeText(tag, content, className) {
@@ -68,18 +57,6 @@
         article.append(block,author);
         const title = localized(item.role);
         if (title.trim()) article.append(makeText('p',title.trim(),'testimonial-role'));
-        const url = sourceUrl(item.sourceUrl);
-        if (url) {
-          const p = document.createElement('p');
-          p.className = 'testimonial-source';
-          const a = document.createElement('a');
-          a.href = url;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          a.textContent = linkText[lang];
-          p.append(a);
-          article.append(p);
-        }
         fragment.append(article);
       }
       list.replaceChildren(fragment);
