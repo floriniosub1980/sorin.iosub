@@ -394,3 +394,10 @@
 /* Source-attributed editorial digests are not presented as verbatim quotes. */
 .testimonial-format{margin:0 0 18px;color:#8b5848;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
 .testimonial-card .testimonial-quote{white-space:normal}
+
+
+/* Full-length critical texts: readable editorial column and preserved paragraphs. */
+.testimonials-section .testimonials-list{grid-template-columns:minmax(0,1fr);max-width:1000px;gap:24px}
+.testimonials-section .testimonial-quote{max-width:900px;margin-bottom:26px}
+.testimonials-section .testimonial-quote .testimonial-paragraph{margin:0 0 1.15em;font:inherit;line-height:inherit;color:inherit}
+.testimonials-section .testimonial-quote .testimonial-paragraph:last-child{margin-bottom:0}
