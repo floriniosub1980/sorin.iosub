@@ -389,3 +389,8 @@
 .artist-motto-credit{font-size:.82rem;font-weight:600;letter-spacing:.06em;color:#7a5a4e;margin-top:24px}
 @media(max-width:900px){.artist-motto{margin-top:64px;padding-top:32px}}
 @media(max-width:640px){.artist-motto{margin-top:42px;padding-top:27px}.artist-motto-quote{font-size:clamp(1.25rem,5.1vw,1.6rem)}.artist-motto-quote p{margin-bottom:19px}}
+
+
+/* Source-attributed editorial digests are not presented as verbatim quotes. */
+.testimonial-format{margin:0 0 18px;color:#8b5848;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.testimonial-card .testimonial-quote{white-space:normal}
