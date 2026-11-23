@@ -45,7 +45,9 @@
   const allowed = ['paintings', 'graphics', 'frescoes'];
   const scope = [...new Set((grid.dataset.r2Categories || '').split(',')
     .map(value => value.trim().toLowerCase()).filter(value => allowed.includes(value)))];
-  const categories = ['all', ...(scope.length ? scope : allowed)];
+  // Home page is a curated selection; category gallery pages remain complete.
+  const featuredIds = (grid.dataset.featuredArtworks || '').split(',').map(id => id.trim()).filter(Boolean);
+  const categories = featuredIds.length ? ['all'] : ['all', ...(scope.length ? scope : allowed)];
   const pick = value => typeof value === 'string' ? value :
     value && typeof value === 'object' ? (value[lang] || value.en || value.ro || '') : '';
 
@@ -615,6 +617,15 @@
         }))
         .filter(work => work._thumbnail && work._full)
         .filter(work => !scope.length || scope.includes(work._category));
+      if (featuredIds.length) {
+        const byId = new Map(allWorks.map(work => [work.id, work]));
+        // If selected records are temporarily absent, keep the crawlable static selection.
+        if (featuredIds.some(id => !byId.has(id))) {
+          grid.setAttribute('aria-busy', 'false');
+          return;
+        }
+        allWorks = featuredIds.map(id => byId.get(id));
+      }
       selectedCategory = 'all';
       renderFilters();
       renderGrid();
