@@ -53,7 +53,7 @@
         const isSummary = item.format === 'editorial_summary';
         const block = document.createElement(isSummary ? 'div' : 'blockquote');
         block.className = 'testimonial-quote';
-        quote.split(/\\n\\s*\\n/).filter(Boolean).forEach(paragraph => {
+        quote.split(/\n\s*\n/).filter(Boolean).forEach(paragraph => {
           block.append(makeText('p', paragraph.trim(), 'testimonial-paragraph'));
         });
         const author = makeText('p', item.author.trim(), 'testimonial-author');
