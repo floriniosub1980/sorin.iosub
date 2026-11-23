@@ -360,3 +360,22 @@
 .site-footer .footer-socials svg{display:block}
 .site-footer .footer-socials a:hover{color:#242622}
 .site-footer .footer-socials a:focus-visible{outline:3px solid #9b533e;outline-offset:4px}
+
+
+/* Artist testimonials: considered editorial presentation; no fabricated quotations. */
+.testimonials-section{background:#eae6de;color:#242622}
+.testimonials-section .testimonials-head{align-items:end}
+.testimonials-section .testimonials-head h2{max-width:680px}
+.testimonials-section .testimonials-head>p{line-height:1.7;max-width:450px}
+.testimonials-empty{max-width:700px;border-top:1px solid #bfb9ad;padding-top:28px;margin:0;color:#68675f;font-size:1.05rem;line-height:1.75}
+.testimonials-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.testimonials-list[hidden],.testimonials-empty[hidden]{display:none}
+.testimonial-card{border:1px solid #ccc5b9;background:#f6f4ef;padding:clamp(28px,3.5vw,48px);min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.testimonial-quote{margin:0 0 32px;padding:0;border:0;font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.35rem,2vw,1.9rem);line-height:1.5;font-weight:400;overflow-wrap:anywhere}
+.testimonial-author{margin:auto 0 0;font-size:.95rem;font-weight:600;letter-spacing:.02em}
+.testimonial-role{margin:8px 0 0;color:#66675f;font-size:.84rem;line-height:1.6}
+.testimonial-source{margin:16px 0 0;font-size:.8rem}
+.testimonial-source a{display:inline-flex;align-items:center;min-height:40px;border-bottom:1px solid #9b533e}
+.testimonial-source a:hover{color:#9b533e}
+@media(max-width:900px){.testimonials-section .testimonials-head{display:block}.testimonials-section .testimonials-head>p{margin-top:18px}.testimonials-list{grid-template-columns:1fr}}
+@media(max-width:640px){.testimonials-section .testimonials-head{margin-bottom:36px}.testimonial-card{padding:28px}.testimonials-empty{font-size:.96rem}}
