@@ -51,8 +51,12 @@
         const article = document.createElement('article');
         article.className = 'testimonial-card';
         const isSummary = item.format === 'editorial_summary';
-        const block = makeText(isSummary ? 'p' : 'blockquote', quote, 'testimonial-quote');
-        const author = makeText('p',item.author.trim(),'testimonial-author');
+        const block = document.createElement(isSummary ? 'div' : 'blockquote');
+        block.className = 'testimonial-quote';
+        quote.split(/\\n\\s*\\n/).filter(Boolean).forEach(paragraph => {
+          block.append(makeText('p', paragraph.trim(), 'testimonial-paragraph'));
+        });
+        const author = makeText('p', item.author.trim(), 'testimonial-author');
         if (isSummary) article.append(makeText('p', summaryLabel[lang], 'testimonial-format'));
         article.append(block,author);
         const title = localized(item.role);
