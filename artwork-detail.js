@@ -35,6 +35,32 @@
     return typeof value[otherLang] === 'string' ? value[otherLang].trim() : '';
   }
 
+
+  // Keep the live metadata in sync with the static SEO generator.
+  function seoSnippet(work,title,authored,otherWorks) {
+    if(authored)return authored;
+    const kind={
+      paintings:lang==='en'?'Painting':'Pictură',
+      graphics:lang==='en'?'Graphic art':'Grafică',
+      frescoes:lang==='en'?'Fresco':'Frescă'
+    }[work.category]||(lang==='en'?'Artwork':'Lucrare');
+    const technique=localized(work.technique);
+    const dim=work.dimensionsCm;
+    const size=Number.isFinite(dim?.width)&&Number.isFinite(dim?.height)
+      ?dim.width+' × '+dim.height+' cm':'';
+    const facts=[Number.isInteger(work.year)?String(work.year):'',size].filter(Boolean);
+    const repeated=otherWorks.some(other=>other.id!==work.id&&
+      localized(other.title).toLocaleLowerCase(lang)===title.trim().toLocaleLowerCase(lang));
+    const first=(lang==='en'?'“':'„')+title+'” — '+(technique||kind)+
+      (lang==='en'?' by Sorin Iosub':' de Sorin Iosub')+
+      (facts.length?' ('+facts.join(', ')+')':'')+'. ';
+    const second=lang==='en'?'View the artwork and details in the artist’s portfolio.':
+      'Vezi imaginea și detaliile lucrării în portofoliul artistului.';
+    const ref=repeated?' '+(lang==='en'?'Catalogue reference: ':'Referință catalog: ')+
+      work.id.toUpperCase()+'.':'';
+    return first+second+ref;
+  }
+
   function mediaUrl(value) {
     if (typeof value !== 'string') return '';
     try {
@@ -81,7 +107,7 @@
     }
   }
 
-  function refresh(work) {
+  function refresh(work, catalogWorks) {
     const title = localized(work.title) || id;
     const description = localized(work.description);
     const alt = localized(work.alt) || title;
@@ -166,13 +192,13 @@
       }
     }
 
-    const generic = text.descriptionFallback;
-    updateMeta('meta[name="description"]', description || generic);
+    const seoDescription = seoSnippet(work, title, description, catalogWorks);
+    updateMeta('meta[name="description"]', seoDescription);
     updateMeta('meta[property="og:title"]', title + ' — Sorin Iosub');
-    updateMeta('meta[property="og:description"]', description || generic);
+    updateMeta('meta[property="og:description"]', seoDescription);
     updateMeta('meta[property="og:image"]', full);
     updateMeta('meta[property="og:image:alt"]', alt);
-    updateStructuredData(work, title, description, alt, full, generic);
+    updateStructuredData(work, title, description, alt, full, seoDescription);
   }
 
   async function run() {
@@ -187,7 +213,7 @@
       }
       const work = catalog.artworks.find(item =>
         item && item.id === id && item.published !== false);
-      if (work) refresh(work);
+      if (work) refresh(work, catalog.artworks.filter(item => item && item.published !== false));
     } catch (error) {
       // Keep the static page intact if there is a transient R2/CORS outage.
       console.warn('Artwork detail refresh failed; using static HTML:', error);

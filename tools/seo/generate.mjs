@@ -25,6 +25,36 @@ function build(catalog) {
   // Selected homepage artworks: two paintings, two graphics, two frescoes.
   // Keep this order stable across RO/EN and future R2 catalogue updates.
   const featuredIds=['lucrare-001','si-0002','sig-0015','sig-0008','sib-0037','sib-0050'];
+
+  // Search snippets must use actual catalogue facts without inventing artistic descriptions.
+  // Empty artwork descriptions stay empty on the page itself.
+  function seoSnippet(work,lang,title,authored,otherWorks){
+    const description=typeof authored==='string'?authored.trim():'';
+    if(description)return description;
+    const en=lang==='en';
+    const kind={
+      paintings:en?'Painting':'Pictură',
+      graphics:en?'Graphic art':'Grafică',
+      frescoes:en?'Fresco':'Frescă'
+    }[work.category]||(en?'Artwork':'Lucrare');
+    const technique=String(pick(work.technique,lang)||'').trim();
+    const dimensions=work.dimensionsCm;
+    const size=Number.isFinite(dimensions?.width)&&Number.isFinite(dimensions?.height)
+      ?dimensions.width+' × '+dimensions.height+' cm':'';
+    const facts=[Number.isInteger(work.year)?String(work.year):'',size].filter(Boolean);
+    const repeated=otherWorks.some(other=>other.id!==work.id&&
+      String(pick(other.title,lang)||'').trim().toLocaleLowerCase(lang)===
+      title.trim().toLocaleLowerCase(lang));
+    const first=(en?'“':'„')+title+'” — '+(technique||kind)+
+      (en?' by Sorin Iosub':' de Sorin Iosub')+
+      (facts.length?' ('+facts.join(', ')+')':'')+'. ';
+    const second=en?'View the artwork and details in the artist’s portfolio.':
+      'Vezi imaginea și detaliile lucrării în portofoliul artistului.';
+    const ref=repeated?' '+(en?'Catalogue reference: ':'Referință catalog: ')+
+      work.id.toUpperCase()+'.':'';
+    return first+second+ref;
+  }
+
   function staticArtworkCard(work,lang,index) {
     const name=pick(work.title,lang);
     const alt=pick(work.alt,lang)||name;
@@ -53,10 +83,10 @@ function build(catalog) {
       const title=pick(w.title,lang),description=pick(w.description,lang),alt=pick(w.alt,lang)||title;
       if(!title)throw Error("Missing title "+w.id);
       const en=lang==="en",category=w.category==="frescoes"?(en?"Frescoes & monumental projects":"Frescă și proiecte monumentale"):(en?"Painting & drawing":"Pictură și desen");
-      const fallback=en?"Artwork from the Sorin Iosub portfolio.":"Lucrare din portofoliul lui Sorin Iosub.";
-      const excerpt=description||fallback;
+      const excerpt=seoSnippet(w,lang,title,description,published);
       const metadata=[w.category==="frescoes"?(en?"Fresco":"Frescă"):w.category==="graphics"?(en?"Graphic art":"Grafică"):(en?"Painting":"Pictură"),Number.isInteger(w.year)?w.year:"",pick(w.technique,lang),Number.isFinite(w.dimensionsCm?.width)&&Number.isFinite(w.dimensionsCm?.height)?`${w.dimensionsCm.width} × ${w.dimensionsCm.height} cm`:""].filter(Boolean).join(" · ");
       const artwork={"@type":"VisualArtwork","@id":absolute+"#artwork","name":title,"description":excerpt,"url":absolute,"inLanguage":lang,"creator":{"@id":domain+"/#artist"},"image":{"@id":absolute+"#image"}};
+      artwork.artform=w.category==="frescoes"?(en?"Fresco":"Frescă"):w.category==="graphics"?(en?"Graphic art":"Grafică"):(en?"Painting":"Pictură");
       if(Number.isInteger(w.year))artwork.dateCreated=String(w.year);
       if(pick(w.technique,lang))artwork.artMedium=pick(w.technique,lang);
       const schema={"@context":"https://schema.org","@graph":[{"@type":"Person","@id":domain+"/#artist","name":"Sorin Iosub","url":domain+"/en/"},{"@type":"ImageObject","@id":absolute+"#image","contentUrl":w.images.full,"caption":alt,"creditText":"Artwork: Sorin Iosub"},artwork,{"@type":"WebPage","@id":absolute+"#page","url":absolute,"name":title,"mainEntity":{"@id":absolute+"#artwork"},"primaryImageOfPage":{"@id":absolute+"#image"},"inLanguage":lang}]};
