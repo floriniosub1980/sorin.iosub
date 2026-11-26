@@ -91,12 +91,13 @@ function build(catalog) {
       if(pick(w.technique,lang))artwork.artMedium=pick(w.technique,lang);
       const rightsPage=domain+(en?"/en/image-rights/":"/ro/drepturi-imagini/");
       const imageObject={"@type":"ImageObject","@id":absolute+"#image","contentUrl":w.images.full,
-        "caption":alt,"creditText":"Artwork: Sorin Iosub",
+        "caption":alt,"creditText":"Artwork and photograph: Sorin Iosub",
+        "creator":{"@type":"Person","@id":domain+"/#artist","name":"Sorin Iosub"},
         "copyrightNotice":en?"© Sorin Iosub — image reproduction requires prior permission.":"© Sorin Iosub — reproducerea imaginilor necesită acord prealabil.",
         "license":rightsPage,"acquireLicensePage":rightsPage+"#request-permission"};
-      // The photographer's name is not yet confirmed. Do not equate artwork creator with photographer.
+      // Artist and photographer are both Sorin Iosub, as confirmed by the rights holder.
       const schema={"@context":"https://schema.org","@graph":[{"@type":"Person","@id":domain+"/#artist","name":"Sorin Iosub","url":domain+"/en/"},imageObject,artwork,{"@type":"WebPage","@id":absolute+"#page","url":absolute,"name":title,"mainEntity":{"@id":absolute+"#artwork"},"primaryImageOfPage":{"@id":absolute+"#image"},"inLanguage":lang}]};
-      const text=en?{home:"Portfolio",practice:"Practice",contact:"Contact",about:"About",view:"View full image",more:"Other artworks",testimonials:"Testimonials",notes:"Details to be confirmed with the artist",language:"Română",rights:"Artwork imagery remains the property of its respective rights holders."}:{home:"Portofoliu",practice:"Practica artistică",contact:"Contact",about:"Despre",view:"Vezi imaginea completă",more:"Alte lucrări",testimonials:"Testimoniale",notes:"Detalii în curs de confirmare cu artistul",language:"English",rights:"Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor."};
+      const text=en?{home:"Portfolio",practice:"Practice",contact:"Contact",about:"About",view:"View full image",more:"Other artworks",testimonials:"Testimonials",notes:"Details to be confirmed with the artist",language:"Română",rights:"Artwork and photographic imagery © Sorin Iosub."}:{home:"Portofoliu",practice:"Practica artistică",contact:"Contact",about:"Despre",view:"Vezi imaginea completă",more:"Alte lucrări",testimonials:"Testimoniale",notes:"Detalii în curs de confirmare cu artistul",language:"English",rights:"Lucrări artistice și fotografii © Sorin Iosub."};
       files[p.slice(1)+"index.html"]=`<!doctype html>
 <html lang="${lang}"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -137,7 +138,7 @@ ${description?`<p class="seo-artwork-description">${e(description)}</p>`:""}
 <div class="seo-artwork-actions"><a href="${e(w.images.full)}" target="_blank" rel="noopener noreferrer">${text.view}</a><a href="${section(lang,w.category)}">${e(category)}</a><a href="/${lang}/#artworks">${text.more}</a></div>
 </div></div></section></main>
 <footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span>${text.rights}</span><a href="${en?"/en/image-rights/":"/ro/drepturi-imagini/"}">${en?"Image rights":"Drepturile imaginilor"}</a><a href="/${lang}/#artworks">${text.home}</a></footer>
-<script src="/mobile.js" defer></script><script src="/artwork-detail.js?v=20261126-image-rights1" data-artwork-refresh defer></script></body></html>
+<script src="/mobile.js" defer></script><script src="/artwork-detail.js?v=20261126-photo-credit1" data-artwork-refresh defer></script></body></html>
 `;
       sitePages.push({p,image:w.images.full});
     }
