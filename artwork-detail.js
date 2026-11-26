@@ -97,6 +97,15 @@
         } else if (entity['@type'] === 'ImageObject') {
           entity.contentUrl = full;
           entity.caption = alt;
+          entity.creditText = 'Artwork: Sorin Iosub';
+          const rightsPage = location.origin + (lang === 'en'
+            ? '/en/image-rights/' : '/ro/drepturi-imagini/');
+          entity.license = rightsPage;
+          entity.acquireLicensePage = rightsPage + '#request-permission';
+          entity.copyrightNotice = lang === 'en'
+            ? '© Sorin Iosub — image reproduction requires prior permission.'
+            : '© Sorin Iosub — reproducerea imaginilor necesită acord prealabil.';
+          // The photographer is not yet identified; do not infer ImageObject.creator.
         } else if (entity['@type'] === 'WebPage') {
           entity.name = title;
         }

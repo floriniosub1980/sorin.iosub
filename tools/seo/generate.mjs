@@ -72,7 +72,7 @@ function build(catalog) {
       '<p class="artwork-meta">'+e(subtitle)+'</p>'+
       '<a class="artwork-details-link" href="'+link+'">'+label+'</a></div></div></article>';
   }
-  const sitePages=["/en/","/ro/","/en/painting-drawing/","/ro/pictura-desen/","/en/frescoes-monumental/","/ro/fresce-monumentale/"].map(p=>({p}));
+  const sitePages=["/en/","/ro/","/en/painting-drawing/","/ro/pictura-desen/","/en/frescoes-monumental/","/ro/fresce-monumentale/","/en/image-rights/","/ro/drepturi-imagini/"].map(p=>({p}));
   for(const w of catalog.artworks.filter(x=>x&&x.published!==false)){
     if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(w.id)||seen.has(w.id))throw Error("Invalid/duplicate ID "+w.id);
     seen.add(w.id);
@@ -89,7 +89,13 @@ function build(catalog) {
       artwork.artform=w.category==="frescoes"?(en?"Fresco":"Frescă"):w.category==="graphics"?(en?"Graphic art":"Grafică"):(en?"Painting":"Pictură");
       if(Number.isInteger(w.year))artwork.dateCreated=String(w.year);
       if(pick(w.technique,lang))artwork.artMedium=pick(w.technique,lang);
-      const schema={"@context":"https://schema.org","@graph":[{"@type":"Person","@id":domain+"/#artist","name":"Sorin Iosub","url":domain+"/en/"},{"@type":"ImageObject","@id":absolute+"#image","contentUrl":w.images.full,"caption":alt,"creditText":"Artwork: Sorin Iosub"},artwork,{"@type":"WebPage","@id":absolute+"#page","url":absolute,"name":title,"mainEntity":{"@id":absolute+"#artwork"},"primaryImageOfPage":{"@id":absolute+"#image"},"inLanguage":lang}]};
+      const rightsPage=domain+(en?"/en/image-rights/":"/ro/drepturi-imagini/");
+      const imageObject={"@type":"ImageObject","@id":absolute+"#image","contentUrl":w.images.full,
+        "caption":alt,"creditText":"Artwork: Sorin Iosub",
+        "copyrightNotice":en?"© Sorin Iosub — image reproduction requires prior permission.":"© Sorin Iosub — reproducerea imaginilor necesită acord prealabil.",
+        "license":rightsPage,"acquireLicensePage":rightsPage+"#request-permission"};
+      // The photographer's name is not yet confirmed. Do not equate artwork creator with photographer.
+      const schema={"@context":"https://schema.org","@graph":[{"@type":"Person","@id":domain+"/#artist","name":"Sorin Iosub","url":domain+"/en/"},imageObject,artwork,{"@type":"WebPage","@id":absolute+"#page","url":absolute,"name":title,"mainEntity":{"@id":absolute+"#artwork"},"primaryImageOfPage":{"@id":absolute+"#image"},"inLanguage":lang}]};
       const text=en?{home:"Portfolio",practice:"Practice",contact:"Contact",about:"About",view:"View full image",more:"Other artworks",testimonials:"Testimonials",notes:"Details to be confirmed with the artist",language:"Română",rights:"Artwork imagery remains the property of its respective rights holders."}:{home:"Portofoliu",practice:"Practica artistică",contact:"Contact",about:"Despre",view:"Vezi imaginea completă",more:"Alte lucrări",testimonials:"Testimoniale",notes:"Detalii în curs de confirmare cu artistul",language:"English",rights:"Imaginile lucrărilor rămân proprietatea deținătorilor drepturilor."};
       files[p.slice(1)+"index.html"]=`<!doctype html>
 <html lang="${lang}"><head>
@@ -130,8 +136,8 @@ ${metadata?`<p class="seo-artwork-meta">${e(metadata)}</p>`:""}
 ${description?`<p class="seo-artwork-description">${e(description)}</p>`:""}
 <div class="seo-artwork-actions"><a href="${e(w.images.full)}" target="_blank" rel="noopener noreferrer">${text.view}</a><a href="${section(lang,w.category)}">${e(category)}</a><a href="/${lang}/#artworks">${text.more}</a></div>
 </div></div></section></main>
-<footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span>${text.rights}</span><a href="/${lang}/#artworks">${text.home}</a></footer>
-<script src="/mobile.js" defer></script><script src="/artwork-detail.js?v=20261119-1" data-artwork-refresh defer></script></body></html>
+<footer class="site-footer"><span>© 2026 SORIN IOSUB</span><span>${text.rights}</span><a href="${en?"/en/image-rights/":"/ro/drepturi-imagini/"}">${en?"Image rights":"Drepturile imaginilor"}</a><a href="/${lang}/#artworks">${text.home}</a></footer>
+<script src="/mobile.js" defer></script><script src="/artwork-detail.js?v=20261126-image-rights1" data-artwork-refresh defer></script></body></html>
 `;
       sitePages.push({p,image:w.images.full});
     }
