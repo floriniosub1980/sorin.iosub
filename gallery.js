@@ -48,6 +48,33 @@
   // Home page is a curated selection; category gallery pages remain complete.
   const featuredIds = (grid.dataset.featuredArtworks || '').split(',').map(id => id.trim()).filter(Boolean);
   const categories = featuredIds.length ? ['all'] : ['all', ...(scope.length ? scope : allowed)];
+
+  // The SEO generator writes canonical artwork pages to the sitemap. Read that
+  // manifest so gallery links switch from the temporary noindex viewer to the
+  // permanent indexable page as soon as the scheduled sync has generated it.
+  let staticDetailIds = new Set(["lucrare-001","si-0002","si-0003","si-0004","si-0005","si-0006","si-0013","si-0014","sig-0007","sig-0008","sip-0011","sip-0012"]);
+
+  async function refreshStaticDetailIds() {
+    try {
+      const response = await fetch('/sitemap.xml', {cache: 'no-store'});
+      if (!response.ok) throw new Error('Sitemap HTTP ' + response.status);
+      const xml = new DOMParser().parseFromString(await response.text(), 'application/xml');
+      if (xml.getElementsByTagName('parsererror').length) throw new Error('Invalid sitemap XML');
+      const prefix = '/' + lang + '/' + (lang === 'en' ? 'artworks' : 'lucrari') + '/';
+      const generated = new Set();
+      for (const node of xml.getElementsByTagNameNS('*', 'loc')) {
+        const url = new URL((node.textContent || '').trim(), location.origin);
+        if (url.hostname !== 'soriniosub.com' || url.search || url.hash ||
+            !url.pathname.startsWith(prefix)) continue;
+        const id = url.pathname.slice(prefix.length).replace(/\/$/, '');
+        if (/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)) generated.add(id);
+      }
+      if (generated.size) staticDetailIds = generated;
+    } catch (error) {
+      // Preserve current fallback routing if sitemap is temporarily inaccessible.
+      console.warn('Static artwork sitemap unavailable:', error);
+    }
+  }
   const pick = value => typeof value === 'string' ? value :
     value && typeof value === 'object' ? (value[lang] || value.en || value.ro || '') : '';
 
@@ -554,8 +581,8 @@
     if (typeof work.id === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(work.id)) {
       const detailLink = document.createElement('a');
       detailLink.className = 'artwork-details-link';
-      // Static SEO pages exist for original artworks; later uploads use a guaranteed 200 detail route.
-      const staticDetailIds = new Set(["lucrare-001","si-0002","si-0003","si-0004","si-0005","si-0006","si-0013","si-0014","sib-00010","sib-0009","sig-0007","sig-0008","sip-0011","sip-0012"]);
+      // Generated static detail URLs are indexable; newly uploaded works use the
+      // temporary viewer until their static page appears in the sitemap.
       const detailBase = '/' + lang + '/' + (lang === 'en' ? 'artworks' : 'lucrari');
       detailLink.href = staticDetailIds.has(work.id) ? detailBase + '/' + work.id + '/' : detailBase + '/view/?id=' + encodeURIComponent(work.id);
       detailLink.textContent = l.detailLink;
@@ -596,6 +623,7 @@
   }
 
   async function load() {
+    const sitemapPromise = refreshStaticDetailIds();
     filters.hidden = true;
     // Keep crawlable static gallery links visible until live R2 data loads.
     const hasStatic = grid.querySelector('.artwork-seo-static') !== null;
@@ -626,6 +654,7 @@
         }
         allWorks = featuredIds.map(id => byId.get(id));
       }
+      await sitemapPromise;
       selectedCategory = 'all';
       renderFilters();
       renderGrid();
